@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import AV from 'leancloud-storage';
 
 const RouteWithLayout = props => {
   const { layout: Layout, component: Component, auth, ...rest } = props;

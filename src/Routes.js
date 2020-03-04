@@ -4,7 +4,7 @@ import { Switch } from 'react-router-dom';
 import { RouteWithLayout } from './components';
 import { Blog } from './layouts';
 
-import { HomeView, PostView } from './views';
+import { HomeView, PostView, ProfileView } from './views';
 
 const Routes = () => {
   return (
@@ -23,6 +23,12 @@ const Routes = () => {
         layout={Blog}
         path="/post"
       />
+      <RouteWithLayout
+        auth={false}
+        component={ProfileView}
+        exact
+        layout={Blog}
+        path="/profile"></RouteWithLayout>
     </Switch>
   );
 };

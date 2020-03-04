@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   EuiHeader,
   EuiHeaderSection,
@@ -9,6 +9,7 @@ import {
   EuiPopover
 } from '@elastic/eui';
 import { useLocation } from 'react-router-dom';
+import AV from 'leancloud-storage';
 
 import styles from './index.module.scss';
 
@@ -31,7 +32,7 @@ const Topbar = () => {
       <EuiHeaderLinks>
         <EuiHeaderLink {...getRouterProps('/post')}>文章</EuiHeaderLink>
 
-        <EuiHeaderLink {...getRouterProps('/info')}>个人简介</EuiHeaderLink>
+        <EuiHeaderLink {...getRouterProps('/profile')}>个人简介</EuiHeaderLink>
 
         <EuiPopover
           isOpen={isPopoverOpen}
