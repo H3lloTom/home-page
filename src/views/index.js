@@ -1,3 +1,4 @@
-export { default as HomeView } from './Home';
-export { default as PostView } from './Post';
-export { default as ProfileView } from './Profile';
+export { default as Home } from './Home';
+export { default as Post } from './Post';
+export { default as Profile } from './Profile';
+export { default as Purchase } from './Purchase';

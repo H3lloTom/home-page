@@ -49,7 +49,7 @@ const Topbar = () => {
         </EuiPopover>
       </EuiHeaderLinks>
       <EuiHeaderSection side="right">
-        <EuiHeaderLogo iconType="user" href="#">
+        <EuiHeaderLogo iconType="user" href="#/purchase">
           <EuiTextColor component="span" color="subdued">
             登录
           </EuiTextColor>
