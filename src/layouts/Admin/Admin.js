@@ -48,34 +48,25 @@ const Admin = props => {
             label: '库存总量',
             href: '#/stock',
             isActive: pathname === '/stock',
-            iconType: 'discoverApp',
-            extraAction: {
-              color: 'subdued',
-              iconType: 'starEmpty',
-              iconSize: 's'
-            }
+            iconType: 'notebookApp'
+          },
+          {
+            label: '商品库',
+            href: '#/goods',
+            isActive: pathname === '/goods',
+            iconType: 'filebeatApp'
           },
           {
             label: '入库',
             href: '#/purchase',
             isActive: pathname === '/purchase',
-            iconType: 'visualizeApp',
-            extraAction: {
-              color: 'subdued',
-              iconType: 'starEmpty',
-              iconSize: 's'
-            }
+            iconType: 'savedObjectsApp'
           },
           {
             label: '出库',
             href: '#/sale',
             isActive: pathname === '/sale',
-            iconType: 'canvasApp',
-            extraAction: {
-              color: 'subdued',
-              iconType: 'starEmpty',
-              iconSize: 's'
-            }
+            iconType: 'usersRolesApp'
           }
         ]
       }

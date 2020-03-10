@@ -32,6 +32,7 @@ const Purchase = () => {
       name: '小计'
     }
   ];
+  const [items, setItems] = useState([]);
   return (
     <EuiForm>
       <EuiFormRow display="rowCompressed" label="采购日期">
@@ -58,7 +59,7 @@ const Purchase = () => {
           <EuiSpacer size="l" />
           <EuiBasicTable
             isSelectable
-            items={[]}
+            items={items}
             itemId="id"
             columns={columns}></EuiBasicTable>
         </React.Fragment>
