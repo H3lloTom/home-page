@@ -13,24 +13,18 @@ import {
   EuiHeaderSection,
   EuiHeaderSectionItem,
   EuiHeaderSectionItemButton,
-  EuiHeaderBreadcrumbs,
   EuiHeaderLogo,
   EuiIcon,
-  EuiImage,
   EuiTitle,
   EuiNavDrawerGroup,
   EuiNavDrawer,
   EuiHorizontalRule,
   EuiShowFor,
-  EuiFocusTrap,
-  EuiButton
+  EuiFocusTrap
 } from '@elastic/eui';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
-// import { keyCodes } from '@elastic/eui/lib/services';
-
-// import HeaderUserMenu from '../header/header_user_menu';
-// import HeaderSpacesMenu from '../header/header_spaces_menu';
+import styles from './index.module.scss';
 
 const Admin = props => {
   const location = useLocation();
@@ -122,7 +116,7 @@ const Admin = props => {
                 </EuiTitle>
               </EuiPageHeaderSection>
             </EuiPageHeader>
-            <EuiPageContent>
+            <EuiPageContent className={styles.content}>
               <EuiPageContentHeader>
                 <EuiPageContentHeaderSection>
                   <EuiTitle>

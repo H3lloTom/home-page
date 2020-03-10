@@ -17,6 +17,7 @@ import {
 import AV from 'leancloud-storage';
 import _ from 'lodash';
 import { GoodsItem } from '../components';
+import styles from './index.module.scss';
 
 const Goods = () => {
   const columns = [
@@ -73,24 +74,32 @@ const Goods = () => {
   ];
   const [items, setItems] = useState([]);
   const [selectedId, setSelectedId] = useState('');
+  const [keywords, setKeywords] = useState('');
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const pagination = {
-    pageIndex: 0,
-    pageSize: 10,
+    pageIndex,
+    pageSize,
     totalItemCount: items.length,
     pageSizeOptions: [5, 10, 20]
   };
-  const [keywords, setKeywords] = useState('');
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [alterModalVisible, setAlterModalVisible] = useState(false);
-  const queryItems = async (keywords = '', pageIndex = 1, pageSize = 10) => {
-    const query = new AV.Query('Goods');
-    const goodsItems = await query
-      .skip((pageIndex - 1) * pageSize)
-      .limit(pageSize)
-      .contains('name', keywords)
-      .find();
-    setItems(goodsItems);
-  };
+  const queryItems = useCallback(
+    async (key = keywords, index = pageIndex, size = pageSize) => {
+      const query = new AV.Query('Goods');
+      const goodsItems = await query
+        .skip((index - 1) * size)
+        .limit(size)
+        .contains('name', key)
+        .find();
+      setItems(goodsItems);
+      setKeywords(key);
+      setPageIndex(index);
+      setPageSize(size);
+    },
+    [keywords, pageIndex, pageSize]
+  );
   const onAdd = () => {
     setAddModalVisible(true);
   };
@@ -102,14 +111,21 @@ const Goods = () => {
     setAlterModalVisible(false);
     queryItems();
   };
-  const onSearchChange = useCallback(key => {
-    queryItems(key);
-  }, []);
+  const onSearchChange = useCallback(
+    key => {
+      queryItems(key);
+    },
+    [queryItems]
+  );
   const debouncedOnSearchChange = useMemo(() => {
     return _.debounce(onSearchChange, 500);
   }, [onSearchChange]);
   const onTableChange = change => {
-    console.log(change);
+    const { page, sort } = change;
+    if (page) {
+      const { index, size } = page;
+      queryItems(keywords, index, size);
+    }
   };
   function onAlter(item) {
     const id = item.getObjectId();
