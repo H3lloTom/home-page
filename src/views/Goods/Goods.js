@@ -57,7 +57,7 @@ const Goods = () => {
       render: (val, item) => item.get('price')
     },
     {
-      name: 'actions',
+      name: '操作',
       actions: [
         {
           name: 'Alter',
@@ -66,8 +66,7 @@ const Goods = () => {
           color: 'primary',
           type: 'icon',
           onClick: onAlter,
-          isPrimary: true,
-          'data-test-subj': 'action-delete'
+          isPrimary: true
         }
       ]
     }

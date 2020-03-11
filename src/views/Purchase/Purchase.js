@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment, useMemo } from 'react';
 import {
   EuiForm,
   EuiFormRow,
@@ -10,30 +10,42 @@ import {
   EuiSpacer,
   EuiButton,
   EuiSuperSelect,
-  EuiHealth
+  EuiHealth,
+  EuiFieldNumber,
+  EuiText,
+  EuiTextColor,
+  EuiPanel
 } from '@elastic/eui';
 import moment from 'moment';
 import schema from 'async-validator';
 import AV from 'leancloud-storage';
+import ac from 'accounting';
 
 import styles from './index.module.scss';
 
-const descriptor = {
+const itemDescriptor = {
   goodsId: {
     type: 'string',
-    required: true
+    required: true,
+    message: '请选择商品'
   },
   color: {
     type: 'string',
-    required: true
+    required: true,
+    message: '请选择颜色'
   },
   size: {
     type: 'string',
-    required: true
+    required: true,
+    message: '请选择尺码'
   },
   number: {
     type: 'integer',
-    required: true
+    required: true,
+    message: '请输入数量(数量>0)',
+    validator(rule, value) {
+      return value > 0;
+    }
   },
   subTotal: {
     type: 'number',
@@ -41,31 +53,57 @@ const descriptor = {
   }
 };
 
-const validator = new schema(descriptor);
+const purchaseDescriptor = {
+  purchaseDate: {
+    type: 'date',
+    required: true
+  },
+  purchaser: {
+    type: 'string',
+    required: true,
+    message: '请填写采购人'
+  },
+  totalPrice: {
+    type: 'number',
+    required: true
+  }
+};
+
+const itemValidator = new schema(itemDescriptor);
+const purchaseValidator = new schema(purchaseDescriptor);
 
 const SUB_ORDER_TEMPLATE = {
   goodsId: '',
   color: '',
   size: '',
+  price: 0,
   number: 0,
   subTotal: 0
 };
 
 const Purchase = () => {
-  const [purchaseDate, setPurchaseDate] = useState(moment());
+  const [purchase, setPurchase] = useState({
+    purchaseDate: moment(),
+    purchaser: ''
+  });
+  const [errors, setErrors] = useState([]);
+  const [goodsItems, setGoodsItems] = useState([]);
+  const [goodsOptions, setGoodsOptions] = useState([]);
   const [colorOptions, setColorOptions] = useState([]);
   const [sizeOptions, setSizeOptions] = useState([]);
   const [items, setItems] = useState([]);
-  const onAddItem = async () => {
-    const nextItems = items.concat({
-      ...SUB_ORDER_TEMPLATE,
-      index: items.length
-    });
-    setItems(nextItems);
+  const onChangePurchase = (key, val) => {
+    const nextPurchase = {
+      ...purchase,
+      [key]: val
+    };
+    setPurchase(nextPurchase);
   };
   const queryDict = async () => {
+    const goodsQuery = new AV.Query('Goods');
     const colorQuery = new AV.Query('Color');
     const sizeQuery = new AV.Query('Size');
+    let goods = await goodsQuery.limit(1000).find();
     let colors = await colorQuery.limit(1000).find();
     let sizes = await sizeQuery.limit(1000).find();
     const colorOptions = colors.map(c => ({
@@ -74,28 +112,102 @@ const Purchase = () => {
         <EuiHealth color={'#' + c.get('hex')}>{c.get('name')}</EuiHealth>
       )
     }));
-    const sizeOptions = sizes.map(c => ({
-      value: c.get('value'),
-      inputDisplay: c.get('name'),
-      dropdownDisplay: <strong>{c.get('name')}</strong>
+    const sizeOptions = sizes.map(s => ({
+      value: s.get('value'),
+      inputDisplay: s.get('name'),
+      dropdownDisplay: <strong>{s.get('name')}</strong>
+    }));
+    const goodsOptions = goods.map(g => ({
+      value: g.id,
+      inputDisplay: g.get('name'),
+      dropdownDisplay: (
+        <Fragment>
+          <EuiText className="eui-textTruncate" size="m" color="default">
+            {g.get('name')}
+          </EuiText>
+          <EuiText size="xs" color="secondary">
+            单价：￥{g.get('price')}
+          </EuiText>
+        </Fragment>
+      )
     }));
     setColorOptions(colorOptions);
     setSizeOptions(sizeOptions);
+    setGoodsOptions(goodsOptions);
+    setGoodsItems(goods);
+  };
+  const onAddItem = async () => {
+    const nextItems = items.concat({
+      ...SUB_ORDER_TEMPLATE,
+      index: items.length
+    });
+    setItems(nextItems);
   };
   const onChangeTableRow = (index, key, val) => {
     const nextItems = [...items];
     nextItems[index][key] = val;
+    nextItems.forEach(n => {
+      const { number, goodsId } = n;
+      if (goodsId) {
+        const goods = goodsItems.find(g => g.id === goodsId);
+        n.price = goods.get('price');
+        n.subTotal = n.price * number;
+      }
+    });
     setItems(nextItems);
   };
+  const onDelete = item => {
+    const nextItems = [...items];
+    nextItems.splice(item.index, 1);
+    nextItems.forEach((val, index) => (val.index = index));
+    setItems(nextItems);
+  };
+  const itemsStatistics = useMemo(() => {
+    const totalNumber = items.map(i => i.number).reduce((a, b) => a + b, 0);
+    const totalPrice = items.map(i => i.subTotal).reduce((a, b) => a + b, 0);
+    return {
+      totalNumber,
+      totalPrice
+    };
+  }, [items]);
   const columns = [
+    {
+      field: 'index',
+      name: '序号',
+      width: '50px',
+      render: (val, item) => {
+        return item.index + 1;
+      }
+    },
     {
       field: 'goodsId',
       name: '商品',
-      render: (val, item) => {}
+      width: '30%',
+      render: (val, item) => {
+        return (
+          <div className={styles.tableCol}>
+            <EuiSuperSelect
+              hasDividers
+              fullWidth
+              valueOfSelected={val}
+              onChange={value => onChangeTableRow(item.index, 'goodsId', value)}
+              itemLayoutAlign="center"
+              options={goodsOptions}></EuiSuperSelect>
+          </div>
+        );
+      },
+      footer: () => {
+        return (
+          <EuiButton size="s" iconType="listAdd" onClick={onAddItem}>
+            新增
+          </EuiButton>
+        );
+      }
     },
     {
       field: 'color',
       name: '颜色',
+      width: '150px',
       render: (val, item) => {
         return (
           <div className={styles.tableCol}>
@@ -130,14 +242,76 @@ const Purchase = () => {
     {
       field: 'number',
       name: '数量',
-      render: () => {}
+      render: (val, item) => {
+        return (
+          <div className={styles.tableCol}>
+            <EuiFieldNumber
+              fullWidth
+              value={val}
+              onChange={e =>
+                onChangeTableRow(item.index, 'number', +e.target.value)
+              }></EuiFieldNumber>
+          </div>
+        );
+      },
+      footer: ({ items }) => {
+        return (
+          <EuiTextColor size="m" color="default">
+            总数：
+            {itemsStatistics.totalNumber}
+          </EuiTextColor>
+        );
+      }
+    },
+    {
+      field: 'price',
+      name: '单价',
+      render: val => {
+        return (
+          <EuiTextColor size="m" color="secondary">
+            {ac.formatMoney(val, '￥')}
+          </EuiTextColor>
+        );
+      }
     },
     {
       field: 'subTotal',
       name: '小计',
-      render: () => {}
+      render: val => {
+        return (
+          <EuiTextColor size="m" color="danger">
+            {ac.formatMoney(val, '￥')}
+          </EuiTextColor>
+        );
+      },
+      footer: ({ items }) => {
+        return (
+          <EuiTextColor size="m" color="danger">
+            总计：
+            {ac.formatMoney(itemsStatistics.totalPrice, '￥')}
+          </EuiTextColor>
+        );
+      }
+    },
+    {
+      name: '操作',
+      actions: [
+        {
+          name: 'Delete',
+          description: '删除商品',
+          icon: 'trash',
+          color: 'primary',
+          type: 'icon',
+          onClick: onDelete,
+          isPrimary: true
+        }
+      ]
     }
   ];
+  const onSave = async () => {
+    try {
+    } catch (error) {}
+  };
   useEffect(() => {
     queryDict();
   }, []);
@@ -145,35 +319,36 @@ const Purchase = () => {
     <EuiForm>
       <EuiFormRow display="rowCompressed" label="采购日期">
         <EuiDatePicker
-          selected={purchaseDate}
-          onChange={setPurchaseDate}
+          selected={purchase.purchaseDate}
+          onChange={val => onChangePurchase('purchaseDate', val)}
           dateFormat="YYYY/MM/DD"
           locale="zh-cn"
           maxDate={moment()}></EuiDatePicker>
       </EuiFormRow>
       <EuiFormRow display="rowCompressed" label="采购人">
-        <EuiFieldText></EuiFieldText>
+        <EuiFieldText
+          value={purchase.purchaser}
+          onChange={e =>
+            onChangePurchase('purchaser', e.target.value)
+          }></EuiFieldText>
       </EuiFormRow>
       <EuiFormRow fullWidth label="商品清单">
-        <React.Fragment>
-          <EuiSpacer size="l" />
-          <EuiFlexGroup alignItems="center">
-            <EuiFlexItem grow={false}>
-              <EuiButton onClick={onAddItem} size="s">
-                新增条目
-              </EuiButton>
-            </EuiFlexItem>
-            <EuiFlexItem />
-          </EuiFlexGroup>
-
-          <EuiSpacer size="l" />
-          <EuiBasicTable
-            isSelectable
-            items={items}
-            itemId="id"
-            columns={columns}></EuiBasicTable>
-        </React.Fragment>
+        <EuiBasicTable
+          items={items}
+          itemId="id"
+          columns={columns}></EuiBasicTable>
       </EuiFormRow>
+      <EuiSpacer size="l" />
+      <EuiPanel paddingSize="s" hasShadow>
+        <EuiFlexGroup justifyContent="flexEnd">
+          <EuiFlexItem grow={false}>
+            <EuiButton fill size="m" onClick={onSave}>
+              保存
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiPanel>
+      <EuiSpacer size="l" />
     </EuiForm>
   );
 };
