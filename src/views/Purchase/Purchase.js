@@ -14,13 +14,15 @@ import {
   EuiFieldNumber,
   EuiText,
   EuiTextColor,
-  EuiPanel
+  EuiPanel,
+  EuiButtonIcon
 } from '@elastic/eui';
 import moment from 'moment';
 import schema from 'async-validator';
 import AV from 'leancloud-storage';
 import ac from 'accounting';
 
+import { GoodsItem } from '../components';
 import styles from './index.module.scss';
 
 const itemDescriptor = {
@@ -55,8 +57,9 @@ const itemDescriptor = {
 
 const purchaseDescriptor = {
   purchaseDate: {
-    type: 'date',
-    required: true
+    type: 'object',
+    required: true,
+    message: '请选择采购日期'
   },
   purchaser: {
     type: 'string',
@@ -92,6 +95,8 @@ const Purchase = () => {
   const [colorOptions, setColorOptions] = useState([]);
   const [sizeOptions, setSizeOptions] = useState([]);
   const [items, setItems] = useState([]);
+  const [addModalVisible, setAddModalVisible] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
   const onChangePurchase = (key, val) => {
     const nextPurchase = {
       ...purchase,
@@ -99,24 +104,9 @@ const Purchase = () => {
     };
     setPurchase(nextPurchase);
   };
-  const queryDict = async () => {
+  const queryGoods = async () => {
     const goodsQuery = new AV.Query('Goods');
-    const colorQuery = new AV.Query('Color');
-    const sizeQuery = new AV.Query('Size');
     let goods = await goodsQuery.limit(1000).find();
-    let colors = await colorQuery.limit(1000).find();
-    let sizes = await sizeQuery.limit(1000).find();
-    const colorOptions = colors.map(c => ({
-      value: c.get('hex'),
-      inputDisplay: (
-        <EuiHealth color={'#' + c.get('hex')}>{c.get('name')}</EuiHealth>
-      )
-    }));
-    const sizeOptions = sizes.map(s => ({
-      value: s.get('value'),
-      inputDisplay: s.get('name'),
-      dropdownDisplay: <strong>{s.get('name')}</strong>
-    }));
     const goodsOptions = goods.map(g => ({
       value: g.id,
       inputDisplay: g.get('name'),
@@ -131,10 +121,28 @@ const Purchase = () => {
         </Fragment>
       )
     }));
-    setColorOptions(colorOptions);
-    setSizeOptions(sizeOptions);
     setGoodsOptions(goodsOptions);
     setGoodsItems(goods);
+  };
+  const queryDict = async () => {
+    const colorQuery = new AV.Query('Color');
+    const sizeQuery = new AV.Query('Size');
+    let colors = await colorQuery.limit(1000).find();
+    let sizes = await sizeQuery.limit(1000).find();
+    const colorOptions = colors.map(c => ({
+      value: c.get('hex'),
+      inputDisplay: (
+        <EuiHealth color={'#' + c.get('hex')}>{c.get('name')}</EuiHealth>
+      )
+    }));
+    const sizeOptions = sizes.map(s => ({
+      value: s.get('value'),
+      inputDisplay: s.get('name'),
+      dropdownDisplay: <strong>{s.get('name')}</strong>
+    }));
+
+    setColorOptions(colorOptions);
+    setSizeOptions(sizeOptions);
   };
   const onAddItem = async () => {
     const nextItems = items.concat({
@@ -181,7 +189,22 @@ const Purchase = () => {
     },
     {
       field: 'goodsId',
-      name: '商品',
+      name: (
+        <Fragment>
+          <EuiTextColor
+            component="span"
+            className="euiTableCellContent__text"
+            size="s">
+            商品
+          </EuiTextColor>
+          <EuiButtonIcon
+            iconType="refresh"
+            onClick={() => queryGoods()}></EuiButtonIcon>
+          <EuiButtonIcon
+            iconType="plusInCircle"
+            onClick={() => setAddModalVisible(true)}></EuiButtonIcon>
+        </Fragment>
+      ),
       width: '30%',
       render: (val, item) => {
         return (
@@ -309,14 +332,105 @@ const Purchase = () => {
     }
   ];
   const onSave = async () => {
+    // 如果商品清单为0条，退出
+    if (items.length === 0) {
+      setErrors([{ message: '请添加商品清单' }]);
+      return;
+    }
+    const p = { ...purchase, totalPrice: itemsStatistics.totalPrice };
+    // 校验采购单信息
     try {
-    } catch (error) {}
+      await purchaseValidator.validate(p);
+    } catch ({ errors }) {
+      setErrors(errors);
+      return;
+    }
+    // 校验商品清单
+    const itemErrors = [];
+    for (let i = 0; i < items.length; i++) {
+      try {
+        await itemValidator.validate(items[i]);
+      } catch ({ errors }) {
+        itemErrors.push({
+          message: `${i + 1}：${errors.map(e => e.message).join(',')}`
+        });
+      }
+    }
+    setErrors([].concat(itemErrors));
+    if (itemErrors.length === 0) {
+      setSaveLoading(true);
+      try {
+        // 创建主订单
+        const mainPurchase = new AV.Object('Purchase');
+        mainPurchase.set({
+          purchaseDate: purchase.purchaseDate.toDate(),
+          purchaser: purchase.purchaser,
+          totalPrice: itemsStatistics.totalPrice
+        });
+        // 保存主订单
+        const mainPurchaseData = await mainPurchase.save();
+        // 创建子订单列表，并关联主订单
+        const subPurchases = items.map(item => {
+          const subPurchase = new AV.Object('SubPurchase');
+          const goods = AV.Object.createWithoutData('Goods', item.goodsId);
+          subPurchase.set({
+            color: item.color,
+            goods: goods,
+            purchaseId: mainPurchaseData.id,
+            number: item.number,
+            size: item.size,
+            subTotal: item.subTotal
+          });
+          return subPurchase;
+        });
+        // 保存子订单
+        await AV.Object.saveAll(subPurchases);
+        // 商品入库
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          // 查询库存中是否有相同货号、颜色、尺寸的商品
+          const query = new AV.Query('Stock');
+          query
+            .equalTo('goodsId', item.goodsId)
+            .equalTo('color', item.color)
+            .equalTo('size', item.size);
+          let stocks = await query.find();
+          // 如果没有相同的商品，则新建一条
+          if (stocks.length === 0) {
+            const instance = new AV.Object('Stock');
+            const goods = AV.Object.createWithoutData('Goods', item.goodsId);
+            instance.set({
+              color: item.color,
+              goods: goods,
+              number: item.number,
+              size: item.size,
+              total: item.subTotal
+            });
+            await instance.save();
+            continue;
+          }
+          // 如果有相同的商品，则更新原有的商品库存
+          const stock = stocks[0];
+          stock.set({
+            number: stock.get('number') + item.number,
+            total: stock.get('total') + item.subTotal
+          });
+          await stock.save();
+        }
+        setSaveLoading(false);
+      } catch (error) {
+        console.log(error);
+        setSaveLoading(false);
+      }
+    }
   };
   useEffect(() => {
     queryDict();
+    queryGoods();
   }, []);
+  const errorMessages = errors.map(e => e.message);
   return (
-    <EuiForm>
+    <EuiForm isInvalid={errors.length > 0} error={errorMessages}>
       <EuiFormRow display="rowCompressed" label="采购日期">
         <EuiDatePicker
           selected={purchase.purchaseDate}
@@ -342,13 +456,22 @@ const Purchase = () => {
       <EuiPanel paddingSize="s" hasShadow>
         <EuiFlexGroup justifyContent="flexEnd">
           <EuiFlexItem grow={false}>
-            <EuiButton fill size="m" onClick={onSave}>
+            <EuiButton isLoading={saveLoading} fill size="m" onClick={onSave}>
               保存
             </EuiButton>
           </EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>
       <EuiSpacer size="l" />
+      {addModalVisible && (
+        <GoodsItem
+          type="add"
+          onClose={() => setAddModalVisible(false)}
+          onConfirm={() => {
+            setAddModalVisible(false);
+            queryGoods();
+          }}></GoodsItem>
+      )}
     </EuiForm>
   );
 };

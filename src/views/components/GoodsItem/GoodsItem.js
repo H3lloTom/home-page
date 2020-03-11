@@ -79,6 +79,7 @@ const GoodsItem = props => {
       setErrors(errors);
       return;
     }
+    setErrors([]);
     setConfirmLoading(true);
 
     if (props.type === 'add') {
@@ -106,7 +107,6 @@ const GoodsItem = props => {
     setItemGoods(nextItemGoods);
   };
   const onChangeFile = files => {
-    console.log(files);
     if (files.length > 0) {
       const fileData = files[0];
       const file = new AV.File(fileData.name, fileData);
@@ -170,7 +170,7 @@ const GoodsItem = props => {
                 <EuiFilePicker
                   initialPromptText="点击上传主图"
                   isInvalid={errorFields.indexOf('picture') !== -1}
-                  accept="image/png,image/jpg,image/gif"
+                  accept="image/*"
                   display="large"
                   onChange={onChangeFile}
                   compressed></EuiFilePicker>
