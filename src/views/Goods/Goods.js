@@ -12,7 +12,8 @@ import {
   EuiFlexItem,
   EuiFieldSearch,
   EuiButton,
-  EuiImage
+  EuiImage,
+  EuiAvatar
 } from '@elastic/eui';
 import AV from 'leancloud-storage';
 import _ from 'lodash';
@@ -25,10 +26,11 @@ const Goods = () => {
       field: 'picture',
       name: '主图',
       render: (val, item) => (
-        <EuiImage
-          size="s"
-          alt={item.get('name')}
-          url={item.get('picture').url}></EuiImage>
+        <EuiAvatar
+          type="space"
+          size="l"
+          name={item.get('name')}
+          imageUrl={item.get('picture').url}></EuiAvatar>
       )
     },
     {
@@ -76,10 +78,11 @@ const Goods = () => {
   const [keywords, setKeywords] = useState('');
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [total, setTotal] = useState(0);
   const pagination = {
     pageIndex,
     pageSize,
-    totalItemCount: items.length,
+    totalItemCount: total,
     pageSizeOptions: [5, 10, 20]
   };
   const [addModalVisible, setAddModalVisible] = useState(false);
@@ -87,11 +90,13 @@ const Goods = () => {
   const queryItems = useCallback(
     async (key = keywords, index = pageIndex, size = pageSize) => {
       const query = new AV.Query('Goods');
+      const total = await query.count();
       const goodsItems = await query
         .skip((index - 1) * size)
         .limit(size)
         .contains('name', key)
         .find();
+      setTotal(total);
       setItems(goodsItems);
       setKeywords(key);
       setPageIndex(index);
@@ -142,9 +147,10 @@ const Goods = () => {
             isClearable
             fullWidth
             placeholder="商品名/商品编码"
-            onChange={e =>
-              debouncedOnSearchChange(e.target.value)
-            }></EuiFieldSearch>
+            onChange={e => {
+              const value = e.target.value;
+              debouncedOnSearchChange(value);
+            }}></EuiFieldSearch>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiButton onClick={onAdd}>新增</EuiButton>

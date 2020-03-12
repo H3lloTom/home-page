@@ -84,7 +84,7 @@ const SUB_ORDER_TEMPLATE = {
   subTotal: 0
 };
 
-const Purchase = () => {
+const Purchase = props => {
   const [purchase, setPurchase] = useState({
     purchaseDate: moment(),
     purchaser: ''
@@ -390,8 +390,9 @@ const Purchase = () => {
           const item = items[i];
           // 查询库存中是否有相同货号、颜色、尺寸的商品
           const query = new AV.Query('Stock');
+          const goodsQuery = new AV.Query('Goods');
           query
-            .equalTo('goodsId', item.goodsId)
+            .matchesQuery('goods', goodsQuery)
             .equalTo('color', item.color)
             .equalTo('size', item.size);
           let stocks = await query.find();
@@ -417,6 +418,7 @@ const Purchase = () => {
           });
           await stock.save();
         }
+        props.history.replace('/Stock');
         setSaveLoading(false);
       } catch (error) {
         console.log(error);
