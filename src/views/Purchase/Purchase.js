@@ -368,7 +368,7 @@ const Purchase = () => {
           totalPrice: itemsStatistics.totalPrice
         });
         // 保存主订单
-        const mainPurchaseData = await mainPurchase.save();
+        // const mainPurchaseData = await mainPurchase.save();
         // 创建子订单列表，并关联主订单
         const subPurchases = items.map(item => {
           const subPurchase = new AV.Object('SubPurchase');
@@ -376,7 +376,7 @@ const Purchase = () => {
           subPurchase.set({
             color: item.color,
             goods: goods,
-            purchaseId: mainPurchaseData.id,
+            purchase: mainPurchase,
             number: item.number,
             size: item.size,
             subTotal: item.subTotal
