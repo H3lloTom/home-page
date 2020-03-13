@@ -15,7 +15,8 @@ import {
   EuiText,
   EuiTextColor,
   EuiPanel,
-  EuiButtonIcon
+  EuiButtonIcon,
+  EuiAvatar
 } from '@elastic/eui';
 import moment from 'moment';
 import schema from 'async-validator';
@@ -109,16 +110,37 @@ const Purchase = props => {
     let goods = await goodsQuery.limit(1000).find();
     const goodsOptions = goods.map(g => ({
       value: g.id,
-      inputDisplay: g.get('name'),
+      inputDisplay: (
+        <EuiFlexGroup alignItems="center">
+          <EuiFlexItem grow={false}>
+            <EuiAvatar
+              size="s"
+              name={g.get('name')}
+              imageUrl={g.get('picture').thumbnailURL(50, 50)}></EuiAvatar>
+          </EuiFlexItem>
+          <EuiFlexItem grow={6}>
+            <EuiText className="eui-textTruncate" size="m" color="default">
+              {g.get('name')}
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      ),
       dropdownDisplay: (
-        <Fragment>
-          <EuiText className="eui-textTruncate" size="m" color="default">
-            {g.get('name')}
-          </EuiText>
-          <EuiText size="xs" color="secondary">
-            单价：￥{g.get('price')}
-          </EuiText>
-        </Fragment>
+        <EuiFlexGroup>
+          <EuiFlexItem grow={false}>
+            <EuiAvatar
+              name={g.get('name')}
+              imageUrl={g.get('picture').thumbnailURL(50, 50)}></EuiAvatar>
+          </EuiFlexItem>
+          <EuiFlexItem grow={6}>
+            <EuiText className="eui-textTruncate" size="m" color="default">
+              {g.get('name')}
+            </EuiText>
+            <EuiText size="xs" color="secondary">
+              单价：￥{g.get('price')}
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       )
     }));
     setGoodsOptions(goodsOptions);

@@ -4,7 +4,7 @@ import { Switch } from 'react-router-dom';
 import { RouteWithLayout } from './components';
 import { Blog, Admin } from './layouts';
 
-import { Home, Post, Profile, Purchase, Goods, Stock } from './views';
+import { Home, Post, Profile, Purchase, Goods, Stock, Outbound } from './views';
 
 const Routes = () => {
   return (
@@ -53,6 +53,14 @@ const Routes = () => {
         pageTitle="进销存"
         contentTitle="库存总量"
         path="/stock"></RouteWithLayout>
+      <RouteWithLayout
+        auth={false}
+        component={Outbound}
+        exact
+        layout={Admin}
+        pageTitle="进销存"
+        contentTitle="出库单"
+        path="/outbound"></RouteWithLayout>
     </Switch>
   );
 };

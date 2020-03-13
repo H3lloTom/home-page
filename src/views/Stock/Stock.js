@@ -100,7 +100,10 @@ const Stock = () => {
             type="space"
             size="l"
             name={item.get('goods').get('name')}
-            imageUrl={item.get('goods').get('picture').url}></EuiAvatar>
+            imageUrl={item
+              .get('goods')
+              .get('picture')
+              .thumbnailURL(50, 50)}></EuiAvatar>
         );
       }
     },
@@ -153,6 +156,18 @@ const Stock = () => {
       }
     },
     {
+      name: '联系方式',
+      field: 'goods.contact',
+      width: '100px',
+      render: (val, item) => {
+        return (
+          <EuiTextColor color="subdued">
+            {item.get('goods').get('contact')}
+          </EuiTextColor>
+        );
+      }
+    },
+    {
       name: '库存',
       field: 'number',
       width: '150px',
@@ -165,7 +180,9 @@ const Stock = () => {
       field: 'total',
       render: (val, item) => {
         return (
-          <EuiTextColor>{ac.formatMoney(item.get('total'), '￥')}</EuiTextColor>
+          <EuiTextColor color="danger">
+            {ac.formatMoney(item.get('total'), '￥')}
+          </EuiTextColor>
         );
       }
     }

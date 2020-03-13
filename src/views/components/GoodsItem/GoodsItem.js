@@ -111,17 +111,14 @@ const GoodsItem = props => {
       const fileData = files[0];
       const file = new AV.File(fileData.name, fileData);
       return file.save().then(file => {
-        onChangeItemGoods('picture', {
-          name: file.get('name'),
-          url: file.get('url'),
-          id: file.id
-        });
+        onChangeItemGoods('picture', file);
       });
     }
     onChangeItemGoods('picture', null);
   };
   const queryItem = async id => {
     const goods = new AV.Query('Goods');
+    goods.include('picture');
     const res = await goods.get(id);
     setItemGoods({
       name: res.get('name'),
@@ -157,7 +154,7 @@ const GoodsItem = props => {
               {itemGoods.picture ? (
                 <EuiListGroup>
                   <EuiListGroupItem
-                    label={itemGoods.picture.name}
+                    label={itemGoods.picture.get('name')}
                     iconType="paperClip"
                     extraAction={{
                       color: 'subdued',

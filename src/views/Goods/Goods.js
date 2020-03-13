@@ -30,7 +30,7 @@ const Goods = () => {
           type="space"
           size="l"
           name={item.get('name')}
-          imageUrl={item.get('picture').url}></EuiAvatar>
+          imageUrl={item.get('picture').thumbnailURL(100, 100)}></EuiAvatar>
       )
     },
     {

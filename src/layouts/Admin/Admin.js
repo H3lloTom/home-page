@@ -58,8 +58,8 @@ const Admin = props => {
           },
           {
             label: '出库',
-            href: '#/sale',
-            isActive: pathname === '/sale',
+            href: '#/outbound',
+            isActive: pathname === '/outbound',
             iconType: 'usersRolesApp'
           }
         ]
