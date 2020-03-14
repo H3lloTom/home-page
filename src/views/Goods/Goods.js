@@ -92,7 +92,7 @@ const Goods = () => {
       const query = new AV.Query('Goods');
       const total = await query.count();
       const goodsItems = await query
-        .skip((index - 1) * size)
+        .skip(index * size)
         .limit(size)
         .contains('name', key)
         .find();

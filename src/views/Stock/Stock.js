@@ -5,17 +5,18 @@ import {
   EuiFieldSearch,
   EuiBasicTable,
   EuiTextColor,
-  EuiColorPicker,
   EuiHealth,
   EuiAvatar,
-  EuiSuperSelect
+  EuiSuperSelect,
+  EuiButton,
+  EuiSpacer
 } from '@elastic/eui';
 import AV from 'leancloud-storage';
 import ac from 'accounting';
 import _ from 'lodash';
 import styles from './index.module.scss';
 
-const Stock = () => {
+const Stock = props => {
   const [items, setItems] = useState([]);
   const [sizeOptions, setSizeOptions] = useState([]);
   const [colorOptions, setColorOptions] = useState([]);
@@ -54,7 +55,7 @@ const Stock = () => {
     query.include('goods');
     query.matchesQuery('goods', goodsQuery);
     const stocks = await query
-      .skip((index - 1) * size)
+      .skip(index * size)
       .limit(size)
       .find();
     const total = await query
@@ -83,14 +84,6 @@ const Stock = () => {
     pageSizeOptions: [5, 10, 20]
   };
   const columns = [
-    {
-      name: '序号',
-      field: 'index',
-      width: '50px',
-      render: (val, item) => {
-        return <EuiTextColor>{item.get('index')}</EuiTextColor>;
-      }
-    },
     {
       name: '图片预览',
       field: 'goods.picture',
@@ -195,6 +188,24 @@ const Stock = () => {
     <Fragment>
       <EuiFlexGroup justifyContent="flexEnd">
         <EuiFlexItem grow={false}>
+          <EuiButton
+            onClick={() => props.history.push('/purchase')}
+            color="danger"
+            fill
+            iconType="refresh">
+            入库
+          </EuiButton>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButton
+            onClick={() => props.history.push('/sale')}
+            color="secondary"
+            fill
+            iconType="refresh">
+            出库
+          </EuiButton>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
           <EuiFieldSearch
             isClearable
             fullWidth
@@ -210,6 +221,7 @@ const Stock = () => {
         items={items}
         onChange={onTableChange}
         pagination={pagination}></EuiBasicTable>
+      <EuiSpacer size="l"></EuiSpacer>
     </Fragment>
   );
 };

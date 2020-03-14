@@ -137,7 +137,7 @@ const Purchase = props => {
               {g.get('name')}
             </EuiText>
             <EuiText size="xs" color="secondary">
-              单价：￥{g.get('price')}
+              单价：{ac.formatMoney(g.get('price'), '￥')}
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -166,13 +166,6 @@ const Purchase = props => {
     setColorOptions(colorOptions);
     setSizeOptions(sizeOptions);
   };
-  const onAddItem = async () => {
-    const nextItems = items.concat({
-      ...SUB_ORDER_TEMPLATE,
-      index: items.length
-    });
-    setItems(nextItems);
-  };
   const onChangeTableRow = (index, key, val) => {
     const nextItems = [...items];
     nextItems[index][key] = val;
@@ -186,11 +179,112 @@ const Purchase = props => {
     });
     setItems(nextItems);
   };
+  const onAddItem = async () => {
+    const nextItems = items.concat({
+      ...SUB_ORDER_TEMPLATE,
+      index: items.length
+    });
+    setItems(nextItems);
+  };
   const onDelete = item => {
     const nextItems = [...items];
     nextItems.splice(item.index, 1);
     nextItems.forEach((val, index) => (val.index = index));
     setItems(nextItems);
+  };
+  const onSave = async () => {
+    // 如果商品清单为0条，退出
+    if (items.length === 0) {
+      setErrors([{ message: '请添加商品' }]);
+      return;
+    }
+    const p = { ...purchase, totalPrice: itemsStatistics.totalPrice };
+    // 校验采购单信息
+    try {
+      await purchaseValidator.validate(p);
+    } catch ({ errors }) {
+      setErrors(errors);
+      return;
+    }
+    // 校验商品清单
+    const itemErrors = [];
+    for (let i = 0; i < items.length; i++) {
+      try {
+        await itemValidator.validate(items[i]);
+      } catch ({ errors }) {
+        itemErrors.push({
+          message: `${i + 1}：${errors.map(e => e.message).join(',')}`
+        });
+      }
+    }
+    setErrors([].concat(itemErrors));
+    if (itemErrors.length === 0) {
+      setSaveLoading(true);
+      try {
+        // 创建主订单
+        const mainPurchase = new AV.Object('Purchase');
+        mainPurchase.set({
+          purchaseDate: purchase.purchaseDate.toDate(),
+          purchaser: purchase.purchaser,
+          totalPrice: itemsStatistics.totalPrice
+        });
+        // 创建子订单列表，并关联主订单
+        const subPurchases = items.map(item => {
+          const subPurchase = new AV.Object('SubPurchase');
+          const goods = AV.Object.createWithoutData('Goods', item.goodsId);
+          subPurchase.set({
+            color: item.color,
+            goods: goods,
+            purchase: mainPurchase,
+            number: item.number,
+            size: item.size,
+            subTotal: item.subTotal
+          });
+          return subPurchase;
+        });
+        // 保存子订单
+        await AV.Object.saveAll(subPurchases);
+        // 商品入库
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          // 查询库存中是否有相同货号、颜色、尺寸的商品
+          const query = new AV.Query('Stock');
+          const goodsQuery = new AV.Query('Goods');
+          goodsQuery.equalTo('id', item.goodsId);
+          query
+            .matchesQuery('goods', goodsQuery)
+            .equalTo('color', item.color)
+            .equalTo('size', item.size);
+          let stocks = await query.find();
+          // 如果没有相同的商品，则新建一条
+          if (stocks.length === 0) {
+            const instance = new AV.Object('Stock');
+            const goods = AV.Object.createWithoutData('Goods', item.goodsId);
+            instance.set({
+              color: item.color,
+              goods: goods,
+              number: item.number,
+              size: item.size,
+              total: item.subTotal
+            });
+            await instance.save();
+            continue;
+          }
+          // 如果有相同的商品，则更新原有的商品库存
+          const stock = stocks[0];
+          stock.set({
+            number: stock.get('number') + item.number,
+            total: stock.get('total') + item.subTotal
+          });
+          await stock.save();
+        }
+        setSaveLoading(false);
+        props.history.replace('/Stock');
+      } catch (error) {
+        console.log(error);
+        setSaveLoading(false);
+      }
+    }
   };
   const itemsStatistics = useMemo(() => {
     const totalNumber = items.map(i => i.number).reduce((a, b) => a + b, 0);
@@ -353,106 +447,11 @@ const Purchase = props => {
       ]
     }
   ];
-  const onSave = async () => {
-    // 如果商品清单为0条，退出
-    if (items.length === 0) {
-      setErrors([{ message: '请添加商品清单' }]);
-      return;
-    }
-    const p = { ...purchase, totalPrice: itemsStatistics.totalPrice };
-    // 校验采购单信息
-    try {
-      await purchaseValidator.validate(p);
-    } catch ({ errors }) {
-      setErrors(errors);
-      return;
-    }
-    // 校验商品清单
-    const itemErrors = [];
-    for (let i = 0; i < items.length; i++) {
-      try {
-        await itemValidator.validate(items[i]);
-      } catch ({ errors }) {
-        itemErrors.push({
-          message: `${i + 1}：${errors.map(e => e.message).join(',')}`
-        });
-      }
-    }
-    setErrors([].concat(itemErrors));
-    if (itemErrors.length === 0) {
-      setSaveLoading(true);
-      try {
-        // 创建主订单
-        const mainPurchase = new AV.Object('Purchase');
-        mainPurchase.set({
-          purchaseDate: purchase.purchaseDate.toDate(),
-          purchaser: purchase.purchaser,
-          totalPrice: itemsStatistics.totalPrice
-        });
-        // 保存主订单
-        // const mainPurchaseData = await mainPurchase.save();
-        // 创建子订单列表，并关联主订单
-        const subPurchases = items.map(item => {
-          const subPurchase = new AV.Object('SubPurchase');
-          const goods = AV.Object.createWithoutData('Goods', item.goodsId);
-          subPurchase.set({
-            color: item.color,
-            goods: goods,
-            purchase: mainPurchase,
-            number: item.number,
-            size: item.size,
-            subTotal: item.subTotal
-          });
-          return subPurchase;
-        });
-        // 保存子订单
-        await AV.Object.saveAll(subPurchases);
-        // 商品入库
-        for (let i = 0; i < items.length; i++) {
-          const item = items[i];
-          // 查询库存中是否有相同货号、颜色、尺寸的商品
-          const query = new AV.Query('Stock');
-          const goodsQuery = new AV.Query('Goods');
-          query
-            .matchesQuery('goods', goodsQuery)
-            .equalTo('color', item.color)
-            .equalTo('size', item.size);
-          let stocks = await query.find();
-          // 如果没有相同的商品，则新建一条
-          if (stocks.length === 0) {
-            const instance = new AV.Object('Stock');
-            const goods = AV.Object.createWithoutData('Goods', item.goodsId);
-            instance.set({
-              color: item.color,
-              goods: goods,
-              number: item.number,
-              size: item.size,
-              total: item.subTotal
-            });
-            await instance.save();
-            continue;
-          }
-          // 如果有相同的商品，则更新原有的商品库存
-          const stock = stocks[0];
-          stock.set({
-            number: stock.get('number') + item.number,
-            total: stock.get('total') + item.subTotal
-          });
-          await stock.save();
-        }
-        props.history.replace('/Stock');
-        setSaveLoading(false);
-      } catch (error) {
-        console.log(error);
-        setSaveLoading(false);
-      }
-    }
-  };
+  const errorMessages = errors.map(e => e.message);
   useEffect(() => {
     queryDict();
     queryGoods();
   }, []);
-  const errorMessages = errors.map(e => e.message);
   return (
     <EuiForm isInvalid={errors.length > 0} error={errorMessages}>
       <EuiFormRow display="rowCompressed" label="采购日期">

@@ -1,9 +1,10 @@
-import React from 'react';
-import { Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Route, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import AV from 'leancloud-storage';
 
 const RouteWithLayout = props => {
+  const hostory = useHistory();
   const {
     layout: Layout,
     component: Component,
@@ -12,14 +13,27 @@ const RouteWithLayout = props => {
     ...rest
   } = props;
 
+  const canVisible = !(auth && !AV.User.current());
+
+  useEffect(() => {
+    if (auth === true) {
+      const current = AV.User.current();
+      if (!current) {
+        hostory.replace('/');
+      }
+    }
+  }, [Component]);
+
   return (
     <Route
       {...rest}
-      render={matchProps => (
-        <Layout {...rest}>
-          <Component {...matchProps} />
-        </Layout>
-      )}
+      render={matchProps =>
+        canVisible && (
+          <Layout {...rest}>
+            <Component {...matchProps} />
+          </Layout>
+        )
+      }
     />
   );
 };

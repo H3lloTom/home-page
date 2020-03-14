@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo, useState } from 'react';
 
 import {
   EuiPage,
@@ -20,15 +20,23 @@ import {
   EuiNavDrawer,
   EuiHorizontalRule,
   EuiShowFor,
-  EuiFocusTrap
+  EuiFocusTrap,
+  EuiPopover,
+  EuiAvatar,
+  EuiListGroup,
+  EuiListGroupItem
 } from '@elastic/eui';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
+import AV from 'leancloud-storage';
 
 import styles from './index.module.scss';
 
 const Admin = props => {
   const location = useLocation();
+  const history = useHistory();
   const navDrawerRef = useRef(null);
+  const [isLogoutPopoverOpen, setLogoutPopoverOpen] = useState(false);
+  const current = useMemo(() => AV.User.current());
   const { children, pageTitle, contentTitle } = props;
   const { pathname } = location;
   const purchaseLinks = [
@@ -58,8 +66,8 @@ const Admin = props => {
           },
           {
             label: '出库',
-            href: '#/outbound',
-            isActive: pathname === '/outbound',
+            href: '#/sale',
+            isActive: pathname === '/sale',
             iconType: 'usersRolesApp'
           }
         ]
@@ -67,6 +75,12 @@ const Admin = props => {
     }
   ];
   const onKeyDown = () => {};
+  const onLogout = () => {
+    AV.User.logOut();
+    history.replace('/');
+  };
+
+  const username = current.getUsername();
   return (
     <EuiFocusTrap>
       <div
@@ -79,7 +93,7 @@ const Admin = props => {
         }}
         onKeyDown={onKeyDown}>
         <EuiHeader>
-          <EuiHeaderSection grow={false}>
+          <EuiHeaderSection grow>
             <EuiShowFor sizes={['xs', 's']}>
               <EuiHeaderSectionItem border="right">
                 <EuiHeaderSectionItemButton
@@ -92,15 +106,32 @@ const Admin = props => {
             <EuiHeaderSectionItem border="right">
               <EuiHeaderLogo
                 iconType="logoRedis"
-                href="#/layout/nav-drawer"
-                aria-label="Goes to home"
+                href="#/"
+                aria-label="Go home"
               />
             </EuiHeaderSectionItem>
             <EuiHeaderSectionItem border="right"></EuiHeaderSectionItem>
           </EuiHeaderSection>
 
           <EuiHeaderSection side="right">
-            <EuiHeaderSectionItem></EuiHeaderSectionItem>
+            <EuiHeaderSectionItem>
+              <EuiPopover
+                panelPaddingSize="none"
+                isOpen={isLogoutPopoverOpen}
+                closePopover={() => setLogoutPopoverOpen(false)}
+                button={
+                  <EuiHeaderSectionItemButton
+                    onClick={() => setLogoutPopoverOpen(true)}>
+                    <EuiAvatar name={username}></EuiAvatar>
+                  </EuiHeaderSectionItemButton>
+                }>
+                <EuiListGroup>
+                  <EuiListGroupItem
+                    label="登出"
+                    onClick={onLogout}></EuiListGroupItem>
+                </EuiListGroup>
+              </EuiPopover>
+            </EuiHeaderSectionItem>
           </EuiHeaderSection>
         </EuiHeader>
         <EuiNavDrawer isLocked ref={navDrawerRef}>
