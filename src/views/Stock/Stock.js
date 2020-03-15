@@ -151,7 +151,7 @@ const Stock = props => {
     {
       name: '联系方式',
       field: 'goods.contact',
-      width: '100px',
+      width: '250px',
       render: (val, item) => {
         return (
           <EuiTextColor color="subdued">

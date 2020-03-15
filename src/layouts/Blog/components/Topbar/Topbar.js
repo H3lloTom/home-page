@@ -17,8 +17,7 @@ import {
   EuiForm,
   EuiFormRow,
   EuiFieldText,
-  EuiFieldPassword,
-  EuiIcon
+  EuiFieldPassword
 } from '@elastic/eui';
 import { useLocation, useHistory } from 'react-router-dom';
 import schema from 'async-validator';
@@ -50,6 +49,7 @@ const Topbar = () => {
   const history = useHistory();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const current = AV.User.current();
   const getRouterProps = path => {
     return {
       href: `#${path}`,
@@ -77,6 +77,12 @@ const Topbar = () => {
     } catch (error) {
       setLoginLoading(false);
     }
+  };
+  const onUserClick = () => {
+    if (current) {
+      return history.push('/stock');
+    }
+    return setLoginModalVisible(true);
   };
   const errorMessages = errors.map(e => e.message);
   return (
@@ -106,11 +112,9 @@ const Topbar = () => {
         </EuiPopover>
       </EuiHeaderLinks>
       <EuiHeaderSection side="right">
-        <EuiHeaderLogo
-          iconType="user"
-          onClick={() => setLoginModalVisible(true)}>
+        <EuiHeaderLogo iconType="user" onClick={onUserClick}>
           <EuiTextColor component="span" color="subdued">
-            登录
+            {current ? current.getUsername() : '登录'}
           </EuiTextColor>
         </EuiHeaderLogo>
       </EuiHeaderSection>
