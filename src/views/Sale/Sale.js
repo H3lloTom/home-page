@@ -222,26 +222,31 @@ const Sale = props => {
           start: dm.parse(s.start).toDate(),
           end: dm.parse(s.end).toDate()
         });
-        // 创建子销售单，并关联主订单
-        const subSales = stockItems.map(item => {
-          const subSale = new AV.Object('SubSale');
-          const stock = AV.Object.createWithoutData('Stock', item.stockId);
-          subSale.set({
-            stock,
-            number: item.number
-          });
-          return subSale;
-        });
-        // 保存子销售单
-        await AV.Object.saveAll(subSales);
         // 修改商品库存
         for (let i = 0; i < stockItems.length; i++) {
           const item = stockItems[i];
+          const saleRecord = new AV.Object('SaleRecord');
+          const subSale = new AV.Object('SubSale');
           const stock = stocks.find(s => s.id === item.stockId);
+          // 设置子订单，并关联主订单
+          subSale.set({
+            stock,
+            sale: mainSale,
+            number: item.number
+          });
+          // 设置销售记录
+          saleRecord.set({
+            stock,
+            subSale,
+            sale: mainSale
+          });
+          // 修改库存
           stock.set({
             number: stock.get('number') - item.number
           });
+          await subSale.save();
           await stock.save();
+          await saleRecord.save();
         }
         setSaveLoading(false);
         props.history.replace('/Stock');

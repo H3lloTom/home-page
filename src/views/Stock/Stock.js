@@ -9,14 +9,25 @@ import {
   EuiAvatar,
   EuiSuperSelect,
   EuiButton,
-  EuiSpacer
+  EuiSpacer,
+  EuiPanel,
+  EuiStat,
+  EuiIcon
 } from '@elastic/eui';
 import AV from 'leancloud-storage';
 import ac from 'accounting';
 import _ from 'lodash';
 import styles from './index.module.scss';
+import { StockDetail } from './components';
 
 const Stock = props => {
+  const [statLoading, setStatLoading] = useState(true);
+  const [stockDetailVisible, setStockDetailVisible] = useState(false);
+  const [selectedStockId, setSelectedStockId] = useState('');
+  const [statInfo, setStatInfo] = useState({
+    allNumber: 0,
+    allTotal: 0
+  });
   const [items, setItems] = useState([]);
   const [sizeOptions, setSizeOptions] = useState([]);
   const [colorOptions, setColorOptions] = useState([]);
@@ -24,6 +35,24 @@ const Stock = props => {
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
+  const queryStat = async () => {
+    const allStockQuery = new AV.Query('Stock');
+    allStockQuery.include('Goods');
+    allStockQuery.limit(1000);
+    const allStock = await allStockQuery.find();
+    const statInfo = allStock.reduce(
+      (a, b) => ({
+        allNumber: a.allNumber + b.get('number'),
+        allTotal: a.allTotal + b.get('total')
+      }),
+      {
+        allNumber: 0,
+        allTotal: 0
+      }
+    );
+    setStatInfo(statInfo);
+    setStatLoading(false);
+  };
   const queryDict = async () => {
     const colorQuery = new AV.Query('Color');
     const sizeQuery = new AV.Query('Size');
@@ -163,7 +192,7 @@ const Stock = props => {
     {
       name: '库存',
       field: 'number',
-      width: '150px',
+      width: '50px',
       render: (val, item) => {
         return <EuiTextColor>{item.get('number')}</EuiTextColor>;
       }
@@ -171,6 +200,7 @@ const Stock = props => {
     {
       name: '小计',
       field: 'total',
+      width: '150px',
       render: (val, item) => {
         return (
           <EuiTextColor color="danger">
@@ -178,14 +208,56 @@ const Stock = props => {
           </EuiTextColor>
         );
       }
+    },
+    {
+      name: '操作',
+      actions: [
+        {
+          name: 'Alter',
+          description: '详情',
+          icon: 'editorUnorderedList',
+          color: 'primary',
+          type: 'icon',
+          onClick: item => {
+            setSelectedStockId(item.id);
+            setStockDetailVisible(true);
+          },
+          isPrimary: true
+        }
+      ]
     }
   ];
   useEffect(() => {
     queryStocks();
     queryDict();
+    queryStat();
   }, []);
   return (
     <Fragment>
+      <EuiFlexGroup>
+        <EuiFlexItem>
+          <EuiPanel>
+            <EuiStat
+              title={ac.formatNumber(statInfo.allNumber)}
+              description="总库存"
+              textAlign="right"
+              isLoading={statLoading}>
+              <EuiIcon type="grid" color="warning" />
+            </EuiStat>
+          </EuiPanel>
+        </EuiFlexItem>
+        <EuiFlexItem>
+          <EuiPanel>
+            <EuiStat
+              title={ac.formatMoney(statInfo.allTotal, '￥')}
+              description="总价钱"
+              textAlign="right"
+              isLoading={statLoading}>
+              <EuiIcon type="bolt" color="danger" />
+            </EuiStat>
+          </EuiPanel>
+        </EuiFlexItem>
+      </EuiFlexGroup>
       <EuiFlexGroup justifyContent="flexEnd">
         <EuiFlexItem grow={false}>
           <EuiButton
@@ -222,6 +294,11 @@ const Stock = props => {
         onChange={onTableChange}
         pagination={pagination}></EuiBasicTable>
       <EuiSpacer size="l"></EuiSpacer>
+      {stockDetailVisible && (
+        <StockDetail
+          stockId={selectedStockId}
+          onClose={() => setStockDetailVisible(false)}></StockDetail>
+      )}
     </Fragment>
   );
 };

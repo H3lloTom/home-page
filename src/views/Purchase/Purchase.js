@@ -228,9 +228,13 @@ const Purchase = props => {
           purchaser: purchase.purchaser,
           totalPrice: itemsStatistics.totalPrice
         });
-        // 创建子订单列表，并关联主订单
-        const subPurchases = items.map(item => {
+        // 商品入库
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          // 查询库存中是否有相同货号、颜色、尺寸的商品
+          // 创建入库记录
           const subPurchase = new AV.Object('SubPurchase');
+          const purchaseRecord = new AV.Object('PurchaseRecord');
           const goods = AV.Object.createWithoutData('Goods', item.goodsId);
           subPurchase.set({
             color: item.color,
@@ -240,25 +244,17 @@ const Purchase = props => {
             size: item.size,
             subTotal: item.subTotal
           });
-          return subPurchase;
-        });
-        // 保存子订单
-        await AV.Object.saveAll(subPurchases);
-        // 商品入库
-        for (let i = 0; i < items.length; i++) {
-          const item = items[i];
-          // 查询库存中是否有相同货号、颜色、尺寸的商品
           const query = new AV.Query('Stock');
-          const goodsQuery = new AV.Query('Goods');
-          goodsQuery.equalTo('id', item.goodsId);
           query
-            .matchesQuery('goods', goodsQuery)
+            .equalTo('goods', goods)
             .equalTo('color', item.color)
             .equalTo('size', item.size);
           let stocks = await query.find();
           // 如果没有相同的商品，则新建一条
           if (stocks.length === 0) {
             const instance = new AV.Object('Stock');
+            purchaseRecord.set('stock', instance);
+            purchaseRecord.set('subPurchase', subPurchase);
             const goods = AV.Object.createWithoutData('Goods', item.goodsId);
             instance.set({
               color: item.color,
@@ -267,7 +263,12 @@ const Purchase = props => {
               size: item.size,
               total: item.subTotal
             });
+            // 保存子订单
+            await subPurchase.save();
+            // 保存库存
             await instance.save();
+            // 保存库存记录
+            await purchaseRecord.save();
             continue;
           }
           // 如果有相同的商品，则更新原有的商品库存
@@ -276,7 +277,17 @@ const Purchase = props => {
             number: stock.get('number') + item.number,
             total: stock.get('total') + item.subTotal
           });
+          purchaseRecord.set({
+            stock,
+            subPurchase,
+            purchase: mainPurchase
+          });
+          // 保存子订单
+          await subPurchase.save();
+          // 保存库存
           await stock.save();
+          // 保存入库记录
+          await purchaseRecord.save();
         }
         setSaveLoading(false);
         props.history.replace('/Stock');

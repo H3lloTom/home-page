@@ -8,17 +8,14 @@ import React, {
 import {
   EuiBasicTable,
   EuiFlexGroup,
-  EuiFlexGrid,
   EuiFlexItem,
   EuiFieldSearch,
   EuiButton,
-  EuiImage,
   EuiAvatar
 } from '@elastic/eui';
 import AV from 'leancloud-storage';
 import _ from 'lodash';
 import { GoodsItem } from '../components';
-import styles from './index.module.scss';
 
 const Goods = () => {
   const columns = [
