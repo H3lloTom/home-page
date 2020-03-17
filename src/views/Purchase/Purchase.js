@@ -235,10 +235,11 @@ const Purchase = props => {
           // 创建入库记录
           const subPurchase = new AV.Object('SubPurchase');
           const purchaseRecord = new AV.Object('PurchaseRecord');
-          const goods = AV.Object.createWithoutData('Goods', item.goodsId);
+          const goods = goodsItems.find(g => g.id === item.goodsId);
           subPurchase.set({
             color: item.color,
             goods: goods,
+            price: goods.get('price'),
             purchase: mainPurchase,
             number: item.number,
             size: item.size,
@@ -253,9 +254,11 @@ const Purchase = props => {
           // 如果没有相同的商品，则新建一条
           if (stocks.length === 0) {
             const instance = new AV.Object('Stock');
-            purchaseRecord.set('stock', instance);
-            purchaseRecord.set('subPurchase', subPurchase);
-            const goods = AV.Object.createWithoutData('Goods', item.goodsId);
+            purchaseRecord.set({
+              stock: instance,
+              subPurchase,
+              purchase: mainPurchase
+            });
             instance.set({
               color: item.color,
               goods: goods,

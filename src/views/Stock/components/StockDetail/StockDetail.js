@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import {
   EuiFlyout,
@@ -23,7 +23,6 @@ const saleRowRenderer = list => props => {
 
 const StockDetail = props => {
   const { stockId, onClose } = props;
-  const [selectedTabId, setSelectedTab] = useState('purchase');
   const [purchaseList, setPurchaseList] = useState([]);
   const [purchasePageNo, setPurchasePageNo] = useState(0);
   const [purchaseTotal, setPurchaseTotal] = useState(0);
@@ -32,8 +31,22 @@ const StockDetail = props => {
   const [salePageNo, setsalePageNo] = useState(0);
   const [saleTotal, setSaleTotal] = useState(0);
 
-  const queryMorePurchase = (skip, pageNo = 0) => {};
-  const loadMoreRows = type => ({ startIndex, stopIndex }) => {};
+  const queryMorePurchase = async (skip = 0, pageNo = purchasePageNo) => {
+    const purchaseRecordQuery = new AV.Query('PurchaseRecord');
+    const stock = AV.Object.createWithoutData('Stock', stockId);
+    purchaseRecordQuery.equalTo('stock', stock);
+    purchaseRecordQuery.include('purchase');
+    purchaseRecordQuery.include('subPurchase');
+    const purchaseList = await purchaseRecordQuery
+      .skip(skip)
+      .limit(10)
+      .find();
+    setPurchasePageNo(purchasePageNo);
+    setPurchaseList(purchaseList);
+  };
+  const loadMoreRows = type => ({ startIndex, stopIndex }) => {
+    console.log(startIndex, stopIndex);
+  };
   const isRowLoaded = type => ({ index }) => {
     const typeList = {
       purchase: purchaseList,
@@ -51,39 +64,66 @@ const StockDetail = props => {
   const tabs = [
     {
       id: 'purchase',
-      name: '入库统计',
+      name: 'purchase',
       content: (
-        <InfiniteLoader
-          isRowLoaded={isRowLoaded('purchase')}
-          loadMoreRows={loadMoreRows('purchase')}
-          rowCount={remoteRowCount('purchase')}>
-          {({ onRowsRendered, registerChild }) => (
-            <List
-              height={200}
-              onRowsRendered={onRowsRendered}
-              ref={registerChild}
-              rowCount={remoteRowCount('purchase')}
-              rowHeight={20}
-              rowRenderer={purchaseRowRenderer(purchaseList)}
-              width={300}
-            />
-          )}
-        </InfiniteLoader>
+        <Fragment>
+          入库统计
+          <InfiniteLoader
+            isRowLoaded={isRowLoaded('purchase')}
+            loadMoreRows={loadMoreRows('purchase')}
+            rowCount={remoteRowCount('purchase')}>
+            {({ onRowsRendered, registerChild }) => (
+              <List
+                height={200}
+                onRowsRendered={onRowsRendered}
+                ref={registerChild}
+                rowCount={remoteRowCount('purchase')}
+                rowHeight={20}
+                rowRenderer={purchaseRowRenderer(purchaseList)}
+                width={300}
+              />
+            )}
+          </InfiniteLoader>
+        </Fragment>
       )
     },
     {
       id: 'sale',
-      name: '出库统计'
+      name: 'sale',
+      content: (
+        <Fragment>
+          出库统计
+          <InfiniteLoader
+            isRowLoaded={isRowLoaded('sale')}
+            loadMoreRows={loadMoreRows('sale')}
+            rowCount={remoteRowCount('sale')}>
+            {({ onRowsRendered, registerChild }) => (
+              <List
+                height={200}
+                onRowsRendered={onRowsRendered}
+                ref={registerChild}
+                rowCount={remoteRowCount('sale')}
+                rowHeight={20}
+                rowRenderer={saleRowRenderer(saleList)}
+                width={300}
+              />
+            )}
+          </InfiniteLoader>
+        </Fragment>
+      )
     }
   ];
+  useEffect(() => {
+    queryMorePurchase();
+  }, []);
   return (
     <EuiFlyout onClose={onClose}>
       <EuiFlyoutHeader>库存详情</EuiFlyoutHeader>
       <EuiFlyoutBody>
         <EuiTabbedContent
           tabs={tabs}
-          selectedTab={selectedTabId}
-          onTabClick={setSelectedTab}></EuiTabbedContent>
+          initialSelectedTab={tabs[0]}
+          autoFocus="selected"></EuiTabbedContent>
       </EuiFlyoutBody>
     </EuiFlyout>
   );
