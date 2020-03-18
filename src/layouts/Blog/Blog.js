@@ -7,7 +7,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem
 } from '@elastic/eui';
-import Topbar from './components/Topbar';
+import { Topbar, Footer } from './components';
 import styles from './index.module.scss';
 
 const Blog = props => {
@@ -19,6 +19,7 @@ const Blog = props => {
         <EuiPageContent className={styles.content}>
           <EuiPageContentBody>{children}</EuiPageContentBody>
         </EuiPageContent>
+        <Footer></Footer>
       </EuiPageBody>
     </EuiPage>
   );
