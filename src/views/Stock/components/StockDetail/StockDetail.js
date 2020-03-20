@@ -4,17 +4,53 @@ import {
   EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
-  EuiTabs,
+  EuiPanel,
   EuiTab,
+  EuiHealth,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiTabbedContent
+  EuiTabbedContent,
+  EuiDescriptionList
 } from '@elastic/eui';
-import { InfiniteLoader, List } from 'react-virtualized';
+import { WindowScroller, List } from 'react-virtualized';
 import AV from 'leancloud-storage';
+import ac from 'accounting';
+import moment from 'moment';
 
 const purchaseRowRenderer = list => props => {
-  return <div>{props.index}</div>;
+  const { index, key } = props;
+  const record = list[index];
+  const listItems = [
+    {
+      title: '采购时间',
+      description: moment(record.get('purchase').get('purchaseDate')).format(
+        'YYYY/MM/DD'
+      )
+    },
+    {
+      title: '单价',
+      description: ac.formatMoney(record.get('subPurchase').get('price'), '￥')
+    },
+    {
+      title: '总金额',
+      description: ac.formatMoney(
+        record.get('subPurchase').get('subTotal'),
+        '￥'
+      )
+    }
+  ];
+  return (
+    <EuiFlexGroup key={key} alignItems="center">
+      <EuiFlexItem grow={1}>
+        <EuiHealth color="subdued"></EuiHealth>
+      </EuiFlexItem>
+      <EuiFlexItem grow={9}>
+        <EuiDescriptionList
+          listItems={listItems}
+          type="inline"></EuiDescriptionList>
+      </EuiFlexItem>
+    </EuiFlexGroup>
+  );
 };
 
 const saleRowRenderer = list => props => {
@@ -35,14 +71,17 @@ const StockDetail = props => {
     const purchaseRecordQuery = new AV.Query('PurchaseRecord');
     const stock = AV.Object.createWithoutData('Stock', stockId);
     purchaseRecordQuery.equalTo('stock', stock);
+    purchaseRecordQuery.include('stock');
     purchaseRecordQuery.include('purchase');
     purchaseRecordQuery.include('subPurchase');
     const purchaseList = await purchaseRecordQuery
       .skip(skip)
       .limit(10)
       .find();
+    const purchaseTotal = await purchaseRecordQuery.count();
     setPurchasePageNo(purchasePageNo);
     setPurchaseList(purchaseList);
+    setPurchaseTotal(purchaseTotal);
   };
   const loadMoreRows = type => ({ startIndex, stopIndex }) => {
     console.log(startIndex, stopIndex);
@@ -67,23 +106,21 @@ const StockDetail = props => {
       name: 'purchase',
       content: (
         <Fragment>
-          入库统计
-          <InfiniteLoader
-            isRowLoaded={isRowLoaded('purchase')}
-            loadMoreRows={loadMoreRows('purchase')}
-            rowCount={remoteRowCount('purchase')}>
-            {({ onRowsRendered, registerChild }) => (
+          <WindowScroller>
+            {({ height, isScrolling, onChildScroll, scrollTop }) => (
               <List
-                height={200}
-                onRowsRendered={onRowsRendered}
-                ref={registerChild}
+                autoHeight
+                height={height}
+                isScrolling={isScrolling}
+                onScroll={onChildScroll}
                 rowCount={remoteRowCount('purchase')}
-                rowHeight={20}
+                rowHeight={50}
+                scrollTop={scrollTop}
                 rowRenderer={purchaseRowRenderer(purchaseList)}
-                width={300}
+                width={500}
               />
             )}
-          </InfiniteLoader>
+          </WindowScroller>
         </Fragment>
       )
     },
@@ -92,23 +129,21 @@ const StockDetail = props => {
       name: 'sale',
       content: (
         <Fragment>
-          出库统计
-          <InfiniteLoader
-            isRowLoaded={isRowLoaded('sale')}
-            loadMoreRows={loadMoreRows('sale')}
-            rowCount={remoteRowCount('sale')}>
-            {({ onRowsRendered, registerChild }) => (
+          <WindowScroller>
+            {({ height, isScrolling, onChildScroll, scrollTop }) => (
               <List
-                height={200}
-                onRowsRendered={onRowsRendered}
-                ref={registerChild}
+                autoHeight
+                height={height}
+                isScrolling={isScrolling}
+                onScroll={onChildScroll}
                 rowCount={remoteRowCount('sale')}
-                rowHeight={20}
+                rowHeight={50}
+                scrollTop={scrollTop}
                 rowRenderer={saleRowRenderer(saleList)}
-                width={300}
+                width={500}
               />
             )}
-          </InfiniteLoader>
+          </WindowScroller>
         </Fragment>
       )
     }

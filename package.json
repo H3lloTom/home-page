@@ -18,18 +18,21 @@
     "node-sass": "^4.13.1",
     "prop-types": "^15.7.2",
     "react": "^16.13.0",
+    "react-app-rewire-hot-loader": "^2.0.1",
+    "react-app-rewired": "^2.1.5",
     "react-dom": "^16.13.0",
+    "react-hot-loader": "^4.12.20",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
     "react-virtualized": "^9.21.2",
     "swr": "^0.1.18"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "test": "react-scripts test",
-    "build": "react-scripts build",
+    "start": "react-app-rewired start",
+    "test": "react-app-rewired test --env=jsdom",
+    "build": "react-app-rewired build",
     "deploy": "node scripts/deploy.js",
-    "eject": "react-scripts eject"
+    "eject": "react-app-rewired eject"
   },
   "eslintConfig": {
     "extends": "react-app",
