@@ -103,7 +103,7 @@ const StockDetail = props => {
   const tabs = [
     {
       id: 'purchase',
-      name: 'purchase',
+      name: '采购记录',
       content: (
         <Fragment>
           <WindowScroller>
@@ -126,7 +126,7 @@ const StockDetail = props => {
     },
     {
       id: 'sale',
-      name: 'sale',
+      name: '销售记录',
       content: (
         <Fragment>
           <WindowScroller>
