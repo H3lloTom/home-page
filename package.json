@@ -23,6 +23,7 @@
     "react-dom": "^16.13.0",
     "react-hot-loader": "^4.12.20",
     "react-list": "^0.8.13",
+    "react-monaco-editor": "^0.35.0",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
     "react-virtualized": "^9.21.2",
@@ -58,6 +59,7 @@
     "husky": "^4.2.3",
     "inquirer": "^7.1.0",
     "lint-staged": "^10.0.8",
+    "monaco-editor-webpack-plugin": "^1.9.0",
     "ora": "^4.0.3",
     "prettier": "^1.19.1"
   },

@@ -1414,6 +1414,13 @@
     "@types/prop-types" "*"
     csstype "^2.2.0"
 
+"@types/react@^15.x || ^16.x":
+  version "16.9.25"
+  resolved "http://registry.npm.souche-inc.com/@types/react/download/@types/react-16.9.25.tgz#6ae2159b40138c792058a23c3c04fd3db49e929e"
+  dependencies:
+    "@types/prop-types" "*"
+    csstype "^2.2.0"
+
 "@types/stack-utils@^1.0.1":
   version "1.0.1"
   resolved "http://registry.npm.souche-inc.com/@types/stack-utils/download/@types/stack-utils-1.0.1.tgz#0a851d3bd96498fa25c33ab7278ed3bd65f06c3e"
@@ -3456,7 +3463,6 @@ dom-serializer@0:
 dom-walk@^0.1.0:
   version "0.1.1"
   resolved "https://registry.npm.taobao.org/dom-walk/download/dom-walk-0.1.1.tgz#672226dc74c8f799ad35307df936aba11acd6018"
-  integrity sha1-ZyIm3HTI95mtNTB9+TaroRrNYBg=
 
 domain-browser@^1.1.1:
   version "1.2.0"
@@ -4519,7 +4525,6 @@ global-prefix@^3.0.0:
 global@^4.3.0:
   version "4.4.0"
   resolved "https://registry.npm.taobao.org/global/download/global-4.4.0.tgz#3e7b105179006a323ed71aafca3e9c57a5cc6406"
-  integrity sha1-PnsQUXkAajI+1xqvyj6cV6XMZAY=
   dependencies:
     min-document "^2.19.0"
     process "^0.11.10"
@@ -6510,7 +6515,6 @@ mimic-fn@^2.0.0, mimic-fn@^2.1.0:
 min-document@^2.19.0:
   version "2.19.0"
   resolved "https://registry.npm.taobao.org/min-document/download/min-document-2.19.0.tgz#7bd282e3f5842ed295bb748cdd9f1ffa2c824685"
-  integrity sha1-e9KC4/WELtKVu3SM3Z8f+iyCRoU=
   dependencies:
     dom-walk "^0.1.0"
 
@@ -6623,6 +6627,16 @@ mkdirp@0.5.1, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.1:
 moment@^2.24.0:
   version "2.24.0"
   resolved "http://registry.npm.souche-inc.com/moment/download/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
+
+monaco-editor-webpack-plugin@^1.9.0:
+  version "1.9.0"
+  resolved "http://registry.npm.souche-inc.com/monaco-editor-webpack-plugin/download/monaco-editor-webpack-plugin-1.9.0.tgz#5b547281b9f404057dc5d8c5722390df9ac90be6"
+  dependencies:
+    loader-utils "^1.2.3"
+
+monaco-editor@*:
+  version "0.20.0"
+  resolved "http://registry.npm.souche-inc.com/monaco-editor/download/monaco-editor-0.20.0.tgz#5d5009343a550124426cb4d965a4d27a348b4dea"
 
 move-concurrently@^1.0.1:
   version "1.0.1"
@@ -8275,12 +8289,10 @@ react-app-polyfill@^1.0.6:
 react-app-rewire-hot-loader@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npm.taobao.org/react-app-rewire-hot-loader/download/react-app-rewire-hot-loader-2.0.1.tgz#9b47d299dac4d861dafdf18b49c3698d0ff04a52"
-  integrity sha1-m0fSmdrE2GHa/fGLScNpjQ/wSlI=
 
 react-app-rewired@^2.1.5:
   version "2.1.5"
   resolved "https://registry.npm.taobao.org/react-app-rewired/download/react-app-rewired-2.1.5.tgz#592ec2eae5c3c5cd96c80930b5dc3f6c34da1dc6"
-  integrity sha1-WS7C6uXDxc2WyAkwtdw/bDTaHcY=
   dependencies:
     semver "^5.6.0"
 
@@ -8357,7 +8369,6 @@ react-focus-lock@^1.17.7:
 react-hot-loader@^4.12.20:
   version "4.12.20"
   resolved "https://registry.npm.taobao.org/react-hot-loader/download/react-hot-loader-4.12.20.tgz#c2c42362a7578e5c30357a5ff7afa680aa0bef8a"
-  integrity sha1-wsQjYqdXjlwwNXpf96+mgKoL74o=
   dependencies:
     fast-levenshtein "^2.0.6"
     global "^4.3.0"
@@ -8389,9 +8400,16 @@ react-lifecycles-compat@^3.0.0, react-lifecycles-compat@^3.0.4:
 react-list@^0.8.13:
   version "0.8.13"
   resolved "https://registry.npm.taobao.org/react-list/download/react-list-0.8.13.tgz#6947d41cccbcca5a8399d5f7822e2a9796f85b70"
-  integrity sha1-aUfUHMy8ylqDmdX3gi4ql5b4W3A=
   dependencies:
     prop-types "15"
+
+react-monaco-editor@^0.35.0:
+  version "0.35.0"
+  resolved "http://registry.npm.souche-inc.com/react-monaco-editor/download/react-monaco-editor-0.35.0.tgz#ceaaca4f292571e95957871145bd7c5f76a4fd33"
+  dependencies:
+    "@types/react" "^15.x || ^16.x"
+    monaco-editor "*"
+    prop-types "^15.7.2"
 
 react-redux@^5.0.7:
   version "5.1.2"
@@ -9153,7 +9171,6 @@ shallow-clone@^3.0.0:
 shallowequal@^1.1.0:
   version "1.1.0"
   resolved "https://registry.npm.taobao.org/shallowequal/download/shallowequal-1.1.0.tgz#188d521de95b9087404fd4dcb68b13df0ae4e7f8"
-  integrity sha1-GI1SHelbkIdAT9TctosT3wrk5/g=
 
 shebang-command@^1.2.0:
   version "1.2.0"
@@ -9314,7 +9331,6 @@ source-map@^0.5.0, source-map@^0.5.6:
 source-map@^0.7.3:
   version "0.7.3"
   resolved "https://registry.npm.taobao.org/source-map/download/source-map-0.7.3.tgz#5302f8169031735226544092e64981f751750383"
-  integrity sha1-UwL4FpAxc1ImVECS5kmB91F1A4M=
 
 spdx-correct@^3.0.0:
   version "3.1.0"

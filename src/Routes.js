@@ -4,7 +4,17 @@ import { Switch } from 'react-router-dom';
 import { RouteWithLayout } from './components';
 import { Blog, Admin } from './layouts';
 
-import { Home, Post, Profile, Purchase, Goods, Stock, Sale } from './views';
+import {
+  Home,
+  Post,
+  Profile,
+  Purchase,
+  Goods,
+  Stock,
+  Sale,
+  BlogList,
+  BlogEdit
+} from './views';
 
 const Routes = () => {
   return (
@@ -61,6 +71,22 @@ const Routes = () => {
         pageTitle="进销存"
         contentTitle="销售统计"
         path="/sale"></RouteWithLayout>
+      <RouteWithLayout
+        auth
+        component={BlogList}
+        exact
+        layout={Admin}
+        pageTitle="博客管理"
+        contentTitle="文章列表"
+        path="/list"></RouteWithLayout>
+      <RouteWithLayout
+        auth
+        component={BlogEdit}
+        exact
+        layout={Admin}
+        pageTitle="博客管理"
+        contentTitle=""
+        path="/edit/:post_id?"></RouteWithLayout>
     </Switch>
   );
 };

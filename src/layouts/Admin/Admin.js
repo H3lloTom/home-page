@@ -82,6 +82,12 @@ const Admin = props => {
         title: '博客管理',
         listItems: [
           {
+            label: '文章列表',
+            href: '#/list',
+            isActive: pathname === '/list',
+            iconType: 'sqlApp'
+          },
+          {
             label: '新建文章',
             href: '#/edit',
             isActive: pathname === '/edit',
@@ -166,13 +172,15 @@ const Admin = props => {
               </EuiPageHeaderSection>
             </EuiPageHeader>
             <EuiPageContent className={styles.content}>
-              <EuiPageContentHeader>
-                <EuiPageContentHeaderSection>
-                  <EuiTitle>
-                    <h2>{contentTitle}</h2>
-                  </EuiTitle>
-                </EuiPageContentHeaderSection>
-              </EuiPageContentHeader>
+              {contentTitle && (
+                <EuiPageContentHeader>
+                  <EuiPageContentHeaderSection>
+                    <EuiTitle>
+                      <h2>{contentTitle}</h2>
+                    </EuiTitle>
+                  </EuiPageContentHeaderSection>
+                </EuiPageContentHeader>
+              )}
               <EuiPageContentBody>{children}</EuiPageContentBody>
             </EuiPageContent>
           </EuiPageBody>
