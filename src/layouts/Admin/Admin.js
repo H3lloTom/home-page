@@ -74,6 +74,23 @@ const Admin = props => {
       }
     }
   ];
+  const blogLinks = [
+    {
+      label: '博客',
+      iconType: 'logoElasticStack',
+      flyoutMenu: {
+        title: '博客管理',
+        listItems: [
+          {
+            label: '新建文章',
+            href: '#/edit',
+            isActive: pathname === '/edit',
+            iconType: 'addDataApp'
+          }
+        ]
+      }
+    }
+  ];
   const onKeyDown = () => {};
   const onLogout = () => {
     AV.User.logOut();
@@ -137,6 +154,7 @@ const Admin = props => {
         <EuiNavDrawer isLocked ref={navDrawerRef}>
           <EuiHorizontalRule margin="none" />
           <EuiNavDrawerGroup listItems={purchaseLinks} />
+          <EuiNavDrawerGroup listItems={blogLinks} />
         </EuiNavDrawer>
         <EuiPage className="euiNavDrawerPage">
           <EuiPageBody className="euiNavDrawerPage__pageBody">

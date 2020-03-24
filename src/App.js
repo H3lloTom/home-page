@@ -1,5 +1,5 @@
 import React from 'react';
-import { hot } from 'react-hot-loader/root';
+// import { hot } from 'react-hot-loader/root';
 import { HashRouter as Router } from 'react-router-dom';
 
 import Routes from './Routes';
@@ -12,4 +12,4 @@ const App = () => {
   );
 };
 
-export default process.env.NODE_ENV === 'development' ? hot(App) : App;
+export default App;
