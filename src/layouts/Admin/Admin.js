@@ -157,7 +157,7 @@ const Admin = props => {
             </EuiHeaderSectionItem>
           </EuiHeaderSection>
         </EuiHeader>
-        <EuiNavDrawer isLocked ref={navDrawerRef}>
+        <EuiNavDrawer showExpandButton={false} isLocked ref={navDrawerRef}>
           <EuiHorizontalRule margin="none" />
           <EuiNavDrawerGroup listItems={purchaseLinks} />
           <EuiNavDrawerGroup listItems={blogLinks} />

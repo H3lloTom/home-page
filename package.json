@@ -23,6 +23,7 @@
     "react-dom": "^16.13.0",
     "react-hot-loader": "^4.12.20",
     "react-list": "^0.8.13",
+    "react-markdown": "^4.3.1",
     "react-monaco-editor": "^0.35.0",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
@@ -56,6 +57,7 @@
   },
   "devDependencies": {
     "chalk": "^3.0.0",
+    "customize-cra": "^0.9.1",
     "husky": "^4.2.3",
     "inquirer": "^7.1.0",
     "lint-staged": "^10.0.8",

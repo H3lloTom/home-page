@@ -11,7 +11,8 @@ import {
   EuiFlexItem,
   EuiFieldSearch,
   EuiButton,
-  EuiAvatar
+  EuiAvatar,
+  EuiSpacer
 } from '@elastic/eui';
 import AV from 'leancloud-storage';
 import _ from 'lodash';
@@ -158,7 +159,7 @@ const Goods = () => {
         items={items}
         onChange={onTableChange}
         pagination={pagination}></EuiBasicTable>
-
+      <EuiSpacer size="l"></EuiSpacer>
       {/* 新增modal */}
       {addModalVisible && (
         <GoodsItem

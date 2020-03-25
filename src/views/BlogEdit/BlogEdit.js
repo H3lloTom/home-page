@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import {
   EuiForm,
   EuiFormRow,
@@ -8,18 +8,21 @@ import {
   EuiSpacer
 } from '@elastic/eui';
 import MonacoEditor from 'react-monaco-editor';
+import ReactMarkdown from 'react-markdown';
+import '@@/styles/md.scss';
 
 const BlogEdit = props => {
+  const [content, setContent] = useState('');
+  const [preview, setPreview] = useState(false);
+  const togglePreview = () => {
+    setPreview(!preview);
+  };
   const controls = [
-    {
-      controlType: 'icon',
-      id: 'controls_icon',
-      iconType: 'flag'
-    },
     {
       controlType: 'button',
       id: 'preview',
-      label: '预览'
+      label: '预览',
+      onClick: togglePreview
     },
     {
       controlType: 'spacer'
@@ -37,12 +40,23 @@ const BlogEdit = props => {
           <EuiFieldText fullWidth placeholder="请输入标题"></EuiFieldText>
         </EuiFormRow>
         <EuiSpacer size="s"></EuiSpacer>
-        <EuiControlBar controls={controls} position="relative"></EuiControlBar>
+        <EuiControlBar
+          controls={controls}
+          position="relative"
+          showOnMobile></EuiControlBar>
         <EuiFormRow fullWidth>
-          <MonacoEditor
-            theme="vs-dark"
-            height="500"
-            language="markdown"></MonacoEditor>
+          {preview ? (
+            <ReactMarkdown
+              className="markdown"
+              source={content}></ReactMarkdown>
+          ) : (
+            <MonacoEditor
+              theme="vs-dark"
+              height="500"
+              value={content}
+              onChange={setContent}
+              language="markdown"></MonacoEditor>
+          )}
         </EuiFormRow>
       </EuiForm>
       <EuiSpacer size="l"></EuiSpacer>
