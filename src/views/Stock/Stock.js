@@ -293,7 +293,7 @@ const Stock = props => {
         items={items}
         onChange={onTableChange}
         pagination={pagination}></EuiBasicTable>
-      <EuiSpacer size="l"></EuiSpacer>
+      <EuiSpacer size="xl"></EuiSpacer>
       {stockDetailVisible && (
         <StockDetail
           stockId={selectedStockId}

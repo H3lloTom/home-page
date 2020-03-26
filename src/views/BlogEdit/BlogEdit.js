@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import {
   EuiForm,
   EuiFormRow,
@@ -15,34 +15,47 @@ import ReactMarkdown from 'react-markdown';
 import classnames from 'classnames';
 import styles from './index.module.scss';
 
+const initState = {
+  step: 1,
+  banner: null,
+  title: '',
+  content: ''
+};
+
+const reducer = function(state, action) {
+  switch (action.type) {
+    case 'setState':
+      return { ...state, ...action.value };
+    default:
+      return state;
+  }
+};
+
 const BlogEdit = props => {
-  const [banner, setBanner] = useState(null);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [currentStep, setCurrentStep] = useState(1);
+  const [state, dispatch] = useReducer(reducer, initState);
   const steps = [
     {
       title: '填写基本信息',
-      isSelected: currentStep === 1,
-      onClick: () => setCurrentStep(1),
+      isSelected: state.step === 1,
+      onClick: () => dispatch({ type: 'setState', value: { step: 1 } }),
       id: 'basic'
     },
     {
       title: '写作',
-      isSelected: currentStep === 2,
-      onClick: () => setCurrentStep(2),
+      isSelected: state.step === 2,
+      onClick: () => dispatch({ type: 'setState', value: { step: 2 } }),
       id: 'writing'
     },
     {
       title: '保存',
-      isSelected: currentStep === 3,
-      onClick: () => setCurrentStep(3),
+      isSelected: state.step === 3,
+      onClick: () => dispatch({ type: 'setState', value: { step: 3 } }),
       id: 'save'
     }
   ];
   return (
-    <Fragment>
-      <EuiFlexGroup direction="column">
+    <>
+      <EuiFlexGroup direction="column" className={styles.container}>
         <EuiFlexItem grow={false}>
           <EuiStepsHorizontal steps={steps}></EuiStepsHorizontal>`
         </EuiFlexItem>
@@ -51,14 +64,16 @@ const BlogEdit = props => {
             <EuiFlexItem>
               <MonacoEditor
                 theme="vs-dark"
-                value={content}
-                onChange={setContent}
+                value={state.content}
+                onChange={content =>
+                  dispatch({ type: 'setState', value: { content } })
+                }
                 language="markdown"></MonacoEditor>
             </EuiFlexItem>
             <EuiFlexItem>
               <ReactMarkdown
                 className={classnames('markdown', styles.markdownArea)}
-                source={content}></ReactMarkdown>
+                source={state.content}></ReactMarkdown>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiFlexItem>
@@ -66,7 +81,7 @@ const BlogEdit = props => {
           <EuiSpacer size="s"></EuiSpacer>
         </EuiFlexItem>
       </EuiFlexGroup>
-    </Fragment>
+    </>
   );
 };
 
