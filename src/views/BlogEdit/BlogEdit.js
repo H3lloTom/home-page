@@ -1,65 +1,71 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect, useReducer } from 'react';
 import {
   EuiForm,
   EuiFormRow,
   EuiFilePicker,
   EuiFieldText,
-  EuiControlBar,
-  EuiSpacer
+  EuiStepsHorizontal,
+  EuiPanel,
+  EuiSpacer,
+  EuiFlexGroup,
+  EuiFlexItem
 } from '@elastic/eui';
 import MonacoEditor from 'react-monaco-editor';
 import ReactMarkdown from 'react-markdown';
-import '@@/styles/md.scss';
+import classnames from 'classnames';
+import styles from './index.module.scss';
 
 const BlogEdit = props => {
+  const [banner, setBanner] = useState(null);
+  const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [preview, setPreview] = useState(false);
-  const togglePreview = () => {
-    setPreview(!preview);
-  };
-  const controls = [
+  const [currentStep, setCurrentStep] = useState(1);
+  const steps = [
     {
-      controlType: 'button',
-      id: 'preview',
-      label: '预览',
-      onClick: togglePreview
+      title: '填写基本信息',
+      isSelected: currentStep === 1,
+      onClick: () => setCurrentStep(1),
+      id: 'basic'
     },
     {
-      controlType: 'spacer'
+      title: '写作',
+      isSelected: currentStep === 2,
+      onClick: () => setCurrentStep(2),
+      id: 'writing'
+    },
+    {
+      title: '保存',
+      isSelected: currentStep === 3,
+      onClick: () => setCurrentStep(3),
+      id: 'save'
     }
   ];
   return (
     <Fragment>
-      <EuiForm>
-        <EuiFormRow fullWidth>
-          <EuiFilePicker
-            fullWidth
-            initialPromptText="请选择banner图"></EuiFilePicker>
-        </EuiFormRow>
-        <EuiFormRow fullWidth>
-          <EuiFieldText fullWidth placeholder="请输入标题"></EuiFieldText>
-        </EuiFormRow>
-        <EuiSpacer size="s"></EuiSpacer>
-        <EuiControlBar
-          controls={controls}
-          position="relative"
-          showOnMobile></EuiControlBar>
-        <EuiFormRow fullWidth>
-          {preview ? (
-            <ReactMarkdown
-              className="markdown"
-              source={content}></ReactMarkdown>
-          ) : (
-            <MonacoEditor
-              theme="vs-dark"
-              height="500"
-              value={content}
-              onChange={setContent}
-              language="markdown"></MonacoEditor>
-          )}
-        </EuiFormRow>
-      </EuiForm>
-      <EuiSpacer size="l"></EuiSpacer>
+      <EuiFlexGroup direction="column">
+        <EuiFlexItem grow={false}>
+          <EuiStepsHorizontal steps={steps}></EuiStepsHorizontal>`
+        </EuiFlexItem>
+        <EuiFlexItem grow>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <MonacoEditor
+                theme="vs-dark"
+                value={content}
+                onChange={setContent}
+                language="markdown"></MonacoEditor>
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <ReactMarkdown
+                className={classnames('markdown', styles.markdownArea)}
+                source={content}></ReactMarkdown>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiSpacer size="s"></EuiSpacer>
+        </EuiFlexItem>
+      </EuiFlexGroup>
     </Fragment>
   );
 };

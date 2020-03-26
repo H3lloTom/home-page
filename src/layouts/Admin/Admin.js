@@ -181,7 +181,9 @@ const Admin = props => {
                   </EuiPageContentHeaderSection>
                 </EuiPageContentHeader>
               )}
-              <EuiPageContentBody>{children}</EuiPageContentBody>
+              <EuiPageContentBody className={styles.body}>
+                {children}
+              </EuiPageContentBody>
             </EuiPageContent>
           </EuiPageBody>
         </EuiPage>
