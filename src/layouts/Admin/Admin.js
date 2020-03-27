@@ -48,25 +48,25 @@ const Admin = props => {
         listItems: [
           {
             label: '库存总量',
-            href: '#/stock',
+            href: '#/a/stock',
             isActive: pathname === '/stock',
             iconType: 'notebookApp'
           },
           {
             label: '商品库',
-            href: '#/goods',
+            href: '#/a/goods',
             isActive: pathname === '/goods',
             iconType: 'filebeatApp'
           },
           {
             label: '入库',
-            href: '#/purchase',
+            href: '#/a/purchase',
             isActive: pathname === '/purchase',
             iconType: 'savedObjectsApp'
           },
           {
             label: '出库',
-            href: '#/sale',
+            href: '#/a/sale',
             isActive: pathname === '/sale',
             iconType: 'usersRolesApp'
           }
@@ -83,14 +83,20 @@ const Admin = props => {
         listItems: [
           {
             label: '文章列表',
-            href: '#/list',
-            isActive: pathname === '/list',
+            href: '#/a/post/list',
+            isActive: pathname === '/post/list',
             iconType: 'sqlApp'
           },
           {
+            label: '文件夹管理',
+            href: '#/a/post/dir',
+            isActive: pathname === '/a/post/dir',
+            iconType: 'folderClosed'
+          },
+          {
             label: '新建文章',
-            href: '#/edit',
-            isActive: pathname === '/edit',
+            href: '#/a/post/edit',
+            isActive: pathname === '/post/edit',
             iconType: 'addDataApp'
           }
         ]
@@ -157,7 +163,7 @@ const Admin = props => {
             </EuiHeaderSectionItem>
           </EuiHeaderSection>
         </EuiHeader>
-        <EuiNavDrawer showExpandButton={false} isLocked ref={navDrawerRef}>
+        <EuiNavDrawer showExpandButton ref={navDrawerRef}>
           <EuiHorizontalRule margin="none" />
           <EuiNavDrawerGroup listItems={purchaseLinks} />
           <EuiNavDrawerGroup listItems={blogLinks} />

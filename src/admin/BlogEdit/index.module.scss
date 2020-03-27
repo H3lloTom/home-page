@@ -1,0 +1,28 @@
+.bannerRow{
+  position: relative;
+}
+
+.banner {
+  width: 100%;
+  text-align: center;
+  background-color: #f2f3f575;
+  img {
+    width: auto;
+    height: 128px;
+  }
+}
+.closeBanner {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.container {
+  height: 100%;
+}
+
+.markdownArea {
+  flex-grow: 1;
+  height: 0;
+  overflow: auto;
+}

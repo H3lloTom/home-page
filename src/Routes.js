@@ -1,20 +1,19 @@
 import React from 'react';
-import { Switch } from 'react-router-dom';
+import { Switch, Router } from 'react-router-dom';
 
 import { RouteWithLayout } from './components';
 import { Blog, Admin } from './layouts';
 
+import { Home, Post, Profile } from './views';
 import {
-  Home,
-  Post,
-  Profile,
   Purchase,
-  Goods,
+  GoodsList,
   Stock,
   Sale,
   BlogList,
-  BlogEdit
-} from './views';
+  BlogEdit,
+  DirectoryManager
+} from './admin';
 
 const Routes = () => {
   return (
@@ -49,12 +48,12 @@ const Routes = () => {
         path="/purchase"></RouteWithLayout>
       <RouteWithLayout
         auth
-        component={Goods}
+        component={GoodsList}
         exact
         layout={Admin}
         pageTitle="进销存"
         contentTitle="商品库"
-        path="/goods"></RouteWithLayout>
+        path="/a/goods"></RouteWithLayout>
       <RouteWithLayout
         auth
         component={Stock}
@@ -62,7 +61,7 @@ const Routes = () => {
         layout={Admin}
         pageTitle="进销存"
         contentTitle="库存总量"
-        path="/stock"></RouteWithLayout>
+        path="/a/stock"></RouteWithLayout>
       <RouteWithLayout
         auth
         component={Sale}
@@ -70,7 +69,7 @@ const Routes = () => {
         layout={Admin}
         pageTitle="进销存"
         contentTitle="销售统计"
-        path="/sale"></RouteWithLayout>
+        path="/a/sale"></RouteWithLayout>
       <RouteWithLayout
         auth
         component={BlogList}
@@ -78,7 +77,7 @@ const Routes = () => {
         layout={Admin}
         pageTitle="博客管理"
         contentTitle="文章列表"
-        path="/list"></RouteWithLayout>
+        path="/a/post/list"></RouteWithLayout>
       <RouteWithLayout
         auth
         component={BlogEdit}
@@ -86,7 +85,15 @@ const Routes = () => {
         layout={Admin}
         pageTitle="博客管理"
         contentTitle=""
-        path="/edit/:post_id?"></RouteWithLayout>
+        path="/a/post/edit/:post_id?"></RouteWithLayout>
+      <RouteWithLayout
+        auth
+        component={DirectoryManager}
+        exact
+        layout={Admin}
+        pageTitle="博客管理"
+        contentTitle="文件夹管理"
+        path="/a/post/dir"></RouteWithLayout>
     </Switch>
   );
 };

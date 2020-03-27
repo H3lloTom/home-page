@@ -73,14 +73,14 @@ const Topbar = () => {
     try {
       await AV.User.logIn(username, password);
       setLoginLoading(false);
-      history.replace('/stock');
+      history.replace('/a/stock');
     } catch (error) {
       setLoginLoading(false);
     }
   };
   const onUserClick = () => {
     if (current) {
-      return history.push('/stock');
+      return history.push('/a/stock');
     }
     return setLoginModalVisible(true);
   };
