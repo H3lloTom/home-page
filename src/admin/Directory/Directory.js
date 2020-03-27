@@ -16,7 +16,23 @@ import {
   EuiFieldText,
   EuiTextArea
 } from '@elastic/eui';
+import schema from 'async-validator';
 import styles from './index.module.scss';
+
+const descriptor = {
+  name: {
+    type: 'string',
+    required: true,
+    message: '请填写名称'
+  },
+  description: {
+    type: 'string',
+    required: true,
+    message: '请填写描述信息'
+  }
+};
+
+const validator = new schema(descriptor);
 
 const Directory = () => {
   const [addVisible, setAddVisible] = useState(false);
