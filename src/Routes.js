@@ -37,7 +37,7 @@ const Routes = () => {
         component={Profile}
         exact
         layout={Blog}
-        path="/profile"></RouteWithLayout>
+        path="/a/profile"></RouteWithLayout>
       <RouteWithLayout
         auth
         component={Purchase}
@@ -45,7 +45,7 @@ const Routes = () => {
         layout={Admin}
         pageTitle="进销存"
         contentTitle="采购入库"
-        path="/purchase"></RouteWithLayout>
+        path="/a/purchase"></RouteWithLayout>
       <RouteWithLayout
         auth
         component={GoodsList}
@@ -72,12 +72,11 @@ const Routes = () => {
         path="/a/sale"></RouteWithLayout>
       <RouteWithLayout
         auth
-        component={BlogList}
+        component={DirectoryManager}
         exact
         layout={Admin}
         pageTitle="博客管理"
-        contentTitle="文章列表"
-        path="/a/post/list"></RouteWithLayout>
+        path="/a/post"></RouteWithLayout>
       <RouteWithLayout
         auth
         component={BlogEdit}
@@ -85,15 +84,7 @@ const Routes = () => {
         layout={Admin}
         pageTitle="博客管理"
         contentTitle=""
-        path="/a/post/edit/:post_id?"></RouteWithLayout>
-      <RouteWithLayout
-        auth
-        component={DirectoryManager}
-        exact
-        layout={Admin}
-        pageTitle="博客管理"
-        contentTitle="文件夹管理"
-        path="/a/post/dir"></RouteWithLayout>
+        path="/a/post/edit/:id?"></RouteWithLayout>
     </Switch>
   );
 };

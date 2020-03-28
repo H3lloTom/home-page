@@ -49,25 +49,25 @@ const Admin = props => {
           {
             label: '库存总量',
             href: '#/a/stock',
-            isActive: pathname === '/stock',
+            isActive: pathname === '/a/stock',
             iconType: 'notebookApp'
           },
           {
             label: '商品库',
             href: '#/a/goods',
-            isActive: pathname === '/goods',
+            isActive: pathname === '/a/goods',
             iconType: 'filebeatApp'
           },
           {
             label: '入库',
             href: '#/a/purchase',
-            isActive: pathname === '/purchase',
+            isActive: pathname === '/a/purchase',
             iconType: 'savedObjectsApp'
           },
           {
             label: '出库',
             href: '#/a/sale',
-            isActive: pathname === '/sale',
+            isActive: pathname === '/a/sale',
             iconType: 'usersRolesApp'
           }
         ]
@@ -82,19 +82,13 @@ const Admin = props => {
         title: '博客管理',
         listItems: [
           {
-            label: '文章列表',
-            href: '#/a/post/list',
-            isActive: pathname === '/post/list',
-            iconType: 'sqlApp'
-          },
-          {
-            label: '文件夹管理',
-            href: '#/a/post/dir',
+            label: '文章管理',
+            href: '#/a/post',
             isActive: pathname === '/a/post/dir',
             iconType: 'folderClosed'
           },
           {
-            label: '新建文章',
+            label: '写作',
             href: '#/a/post/edit',
             isActive: pathname === '/post/edit',
             iconType: 'addDataApp'
