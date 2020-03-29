@@ -4,6 +4,7 @@ const path = require('path');
 const inquirer = require('inquirer');
 const ora = require('ora');
 const chalk = require('chalk');
+const ProgressBar = require('progress');
 const config = require('./config');
 
 const loading = ora();
@@ -26,8 +27,8 @@ c.on('ready', async () => {
   }
   loading.succeed('清除完成');
 
-  loading.text = '开始上传文件';
-  loading.start();
+  // loading.text = '开始上传文件';
+  // loading.start();
   try {
     await putAll(c, files);
   } catch (error) {
@@ -61,14 +62,16 @@ async function main() {
 main();
 
 async function putAll(c, files) {
-  try {
-    for (let index = 0; index < files.length; index++) {
-      const file = files[index];
-      const server_path = file.replace(build_dir, '/htdocs');
-      await putFile(c, file, server_path);
-    }
-  } catch (error) {
-    console.error(error);
+  const bar = new ProgressBar('上传中 [:bar] :current/:total :percent', {
+    incomplete: ' ',
+    width: 20,
+    total: files.length
+  });
+  for (let index = 0; index < files.length; index++) {
+    const file = files[index];
+    const server_path = file.replace(build_dir, '/htdocs');
+    await putFile(c, file, server_path);
+    bar.tick();
   }
 }
 
