@@ -21,19 +21,16 @@ c.on('ready', async () => {
   try {
     await deleteAll(c, '/htdocs');
   } catch (error) {
-    console.log(chalk.red(error));
     loading.fail('清除文件失败');
+    console.log(error);
     process.exit(0);
   }
   loading.succeed('清除完成');
-
-  // loading.text = '开始上传文件';
-  // loading.start();
   try {
     await putAll(c, files);
   } catch (error) {
-    console.log(chalk.red(error));
     loading.fail('上传文件失败');
+    console.log(error);
     process.exit(0);
   }
 
