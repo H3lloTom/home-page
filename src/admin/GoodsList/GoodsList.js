@@ -88,11 +88,12 @@ const Goods = () => {
   const queryItems = useCallback(
     async (key = keywords, index = pageIndex, size = pageSize) => {
       const query = new AV.Query('Goods');
+      query.descending('createdAt');
+      query.contains('name', key);
       const total = await query.count();
       const goodsItems = await query
         .skip(index * size)
         .limit(size)
-        .contains('name', key)
         .find();
       setTotal(total);
       setItems(goodsItems);
@@ -115,7 +116,7 @@ const Goods = () => {
   };
   const onSearchChange = useCallback(
     key => {
-      queryItems(key);
+      queryItems(key, 0);
     },
     [queryItems]
   );

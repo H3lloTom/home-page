@@ -83,14 +83,11 @@ const Stock = props => {
     goodsQuery.contains('name', key);
     query.include('goods');
     query.matchesQuery('goods', goodsQuery);
+    const total = await query.count();
     const stocks = await query
       .skip(index * size)
       .limit(size)
       .find();
-    const total = await query
-      .skip((index - 1) * size)
-      .limit(size)
-      .count();
     setTotal(total);
     setItems(stocks);
     setKeywords(key);
@@ -104,7 +101,7 @@ const Stock = props => {
       queryStocks(keywords, index, size);
     }
   };
-  const onSearchChange = key => queryStocks(key);
+  const onSearchChange = key => queryStocks(key, 0);
   const debouncedOnSearchChange = _.debounce(onSearchChange, 500);
   const pagination = {
     pageIndex,
