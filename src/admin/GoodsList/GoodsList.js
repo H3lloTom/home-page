@@ -11,7 +11,7 @@ import {
   EuiFlexItem,
   EuiFieldSearch,
   EuiButton,
-  EuiAvatar,
+  EuiImage,
   EuiSpacer
 } from '@elastic/eui';
 import AV from 'leancloud-storage';
@@ -24,11 +24,13 @@ const Goods = () => {
       field: 'picture',
       name: '主图',
       render: (val, item) => (
-        <EuiAvatar
-          type="space"
-          size="l"
-          name={item.get('name')}
-          imageUrl={item.get('picture').thumbnailURL(100, 100)}></EuiAvatar>
+        <EuiImage
+          size={100}
+          hasShadow
+          allowFullScreen
+          alt={item.get('name')}
+          url={item.get('picture').get('url')}
+        />
       )
     },
     {

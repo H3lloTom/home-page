@@ -7,6 +7,7 @@ import {
   EuiTextColor,
   EuiHealth,
   EuiAvatar,
+  EuiImage,
   EuiSuperSelect,
   EuiButton,
   EuiSpacer,
@@ -79,6 +80,7 @@ const Stock = props => {
     size = pageSize
   ) => {
     const query = new AV.Query('Stock');
+    query.descending('updatedAt');
     const goodsQuery = new AV.Query('Goods');
     goodsQuery.contains('name', key);
     query.include('goods');
@@ -115,14 +117,16 @@ const Stock = props => {
       field: 'goods.picture',
       render: (val, item) => {
         return (
-          <EuiAvatar
-            type="space"
-            size="l"
-            name={item.get('goods').get('name')}
-            imageUrl={item
+          <EuiImage
+            size={100}
+            hasShadow
+            allowFullScreen
+            alt={item.get('goods').get('name')}
+            url={item
               .get('goods')
               .get('picture')
-              .thumbnailURL(50, 50)}></EuiAvatar>
+              .get('url')}
+          />
         );
       }
     },
@@ -135,6 +139,7 @@ const Stock = props => {
     },
     {
       name: '商品编码',
+      width: '100px',
       field: 'goods.itemCode',
       render: (val, item) => {
         return <EuiTextColor>{item.get('goods').get('itemCode')}</EuiTextColor>;

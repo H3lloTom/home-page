@@ -249,7 +249,7 @@ const Sale = props => {
           await saleRecord.save();
         }
         setSaveLoading(false);
-        props.history.replace('/Stock');
+        props.history.replace('/a/stock');
       } catch (error) {
         console.log(error);
         setSaveLoading(false);
