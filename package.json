@@ -36,7 +36,7 @@
     "test": "react-app-rewired test --env=jsdom",
     "build": "react-app-rewired build",
     "deploy": "node scripts/deploy.js",
-    "eject": "react-app-rewired eject"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app",
@@ -76,7 +76,7 @@
     }
   },
   "lint-staged": {
-    "*.{js,jsx}": [
+    "src/**/*.{js,jsx}": [
       "prettier --write"
     ]
   }
