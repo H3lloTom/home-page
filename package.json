@@ -35,7 +35,7 @@
     "start": "react-app-rewired start",
     "test": "react-app-rewired test --env=jsdom",
     "build": "react-app-rewired build",
-    "deploy": "node scripts/deploy.js",
+    "deploy": "node deploy/deploy.js",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
