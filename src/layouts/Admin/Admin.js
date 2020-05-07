@@ -69,6 +69,12 @@ const Admin = props => {
             href: '#/a/sale',
             isActive: pathname === '/a/sale',
             iconType: 'usersRolesApp'
+          },
+          {
+            label: '记账单',
+            href: '#/a/billing',
+            isActive: pathname === '/a/billing',
+            iconType: 'usersRolesApp'
           }
         ]
       }

@@ -13,7 +13,7 @@ const c = new Client();
 
 const build_dir = path.resolve(__dirname, '../build').replace(/\\/g, '/');
 
-const files = glob.sync(build_dir + '/**/*.*');
+const files = glob.sync(build_dir + '/index.html');
 
 c.on('ready', async () => {
   loading.text = '清除缓存中';

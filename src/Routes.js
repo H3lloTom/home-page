@@ -11,6 +11,7 @@ import {
   Stock,
   Sale,
   BlogList,
+  Billing,
   BlogEdit,
   DirectoryManager
 } from './admin';
@@ -85,6 +86,14 @@ const Routes = () => {
         pageTitle="博客管理"
         contentTitle=""
         path="/a/post/edit/:id?"></RouteWithLayout>
+      <RouteWithLayout
+        auth
+        component={Billing}
+        exact
+        layout={Admin}
+        pageTitle="记账单"
+        contentTitle=""
+        path="/a/billing"></RouteWithLayout>
     </Switch>
   );
 };
