@@ -38,7 +38,7 @@ const Routes = () => {
         component={Profile}
         exact
         layout={Blog}
-        path="/a/profile"></RouteWithLayout>
+        path="/profile"></RouteWithLayout>
       <RouteWithLayout
         auth
         component={Purchase}
