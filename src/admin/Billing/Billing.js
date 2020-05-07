@@ -43,6 +43,63 @@ const options = [
 ];
 
 const Billing = () => {
+  const [activeId, setActiveId] = useState('');
+  const [addModalVisible, setAddModalVisible] = useState(false);
+  const [alterModalVisible, setAlterModalVisible] = useState(false);
+  const [items, setItems] = useState([]);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [start, setStart] = useState(null);
+  const [end, setEnd] = useState(null);
+  const pagination = {
+    pageIndex,
+    pageSize,
+    totalItemCount: total,
+    pageSizeOptions: [5, 10, 20]
+  };
+  const queryItems = async (index = pageIndex, size = pageSize) => {
+    const query = new AV.Query('Billing');
+    query.descending('createdAt');
+    start && query.greaterThanOrEqualTo('createdAt', start.toDate());
+    end && query.lessThanOrEqualTo('createdAt', end.toDate());
+    selectedOptions.length > 0 &&
+      query.containedIn(
+        'type',
+        selectedOptions.map(s => s.id)
+      );
+    query.include('createdBy');
+    const total = await query.count();
+    const billingItems = await query
+      .skip(index * size)
+      .limit(size)
+      .find();
+    setTotal(total);
+    setItems(billingItems);
+    setPageIndex(index);
+    setPageSize(size);
+  };
+  const onTableChange = change => {
+    const { page, sort } = change;
+    if (page) {
+      const { index, size } = page;
+      queryItems(index, size);
+    }
+  };
+  const handleDelete = item => {
+    const billing = AV.Object.createWithoutData('Billing', item.id);
+    billing.destroy();
+    queryItems();
+  };
+  const onCreate = () => {
+    setAddModalVisible(false);
+    queryItems();
+  };
+  const onSave = () => {
+    setAlterModalVisible(false);
+    queryItems();
+  };
   const columns = [
     {
       field: 'type',
@@ -94,63 +151,11 @@ const Billing = () => {
           color: 'danger',
           name: 'Delete',
           description: '删除',
-          onClick: item => {}
+          onClick: handleDelete
         }
       ]
     }
   ];
-  const [activeId, setActiveId] = useState('');
-  const [addModalVisible, setAddModalVisible] = useState(false);
-  const [alterModalVisible, setAlterModalVisible] = useState(false);
-  const [items, setItems] = useState([]);
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [total, setTotal] = useState(0);
-  const [selectedOptions, setSelectedOptions] = useState([]);
-  const [start, setStart] = useState(null);
-  const [end, setEnd] = useState(null);
-  const pagination = {
-    pageIndex,
-    pageSize,
-    totalItemCount: total,
-    pageSizeOptions: [5, 10, 20]
-  };
-  const queryItems = async (index = pageIndex, size = pageSize) => {
-    const query = new AV.Query('Billing');
-    query.descending('createdAt');
-    start && query.greaterThanOrEqualTo('createdAt', start.toDate());
-    end && query.lessThanOrEqualTo('createdAt', end.toDate());
-    selectedOptions.length > 0 &&
-      query.containedIn(
-        'type',
-        selectedOptions.map(s => s.id)
-      );
-    query.include('createdBy');
-    const total = await query.count();
-    const billingItems = await query
-      .skip(index * size)
-      .limit(size)
-      .find();
-    setTotal(total);
-    setItems(billingItems);
-    setPageIndex(index);
-    setPageSize(size);
-  };
-  const onTableChange = change => {
-    const { page, sort } = change;
-    if (page) {
-      const { index, size } = page;
-      queryItems(index, size);
-    }
-  };
-  const onCreate = () => {
-    setAddModalVisible(false);
-    queryItems();
-  };
-  const onSave = () => {
-    setAlterModalVisible(false);
-    queryItems();
-  };
   useEffect(() => {
     queryItems(0);
   }, [start, end, selectedOptions]);
