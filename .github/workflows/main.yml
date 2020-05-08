@@ -36,5 +36,3 @@ jobs:
 
       - name: Deploy html file
         run: npm run deploy FTP_PASSWORD=${{ secrets.FTP_PASSWORD }}
-
-      - name:
