@@ -25,6 +25,8 @@ jobs:
         run: npm install
 
       - name: Build bundle
+        env:
+          CI: false
         run: npm run build
 
       - name: Deploy static file
@@ -35,4 +37,6 @@ jobs:
           publish_branch: build
 
       - name: Deploy html file
-        run: npm run deploy FTP_PASSWORD=${{ secrets.FTP_PASSWORD }}
+        env:
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: npm run deploy
