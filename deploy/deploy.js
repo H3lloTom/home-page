@@ -52,7 +52,7 @@ async function main() {
   // }
   c.connect({
     ...config,
-    password:'xyq52099.'
+    password: process.env.FTP_PASSWORD
   });
 }
 

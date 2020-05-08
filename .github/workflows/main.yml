@@ -6,9 +6,9 @@ name: CI
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -19,12 +19,22 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: install node_modules
-      run: npm install
+      - name: Install node_modules
+        run: npm install
 
-    # Runs a single command using the runners shell
-    - name: deploy html file
-      run: npm run deploy
+      - name: Build bundle
+        run: npm run build
+
+      - name: Deploy static file
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+          publish_branch: build
+
+      - name: Deploy html file
+        run: npm run deploy FTP_PASSWORD=${{ secrets.FTP_PASSWORD }}
+
+      - name:
