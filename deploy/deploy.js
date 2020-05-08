@@ -1,9 +1,7 @@
 const Client = require('ftp');
 const glob = require('glob');
 const path = require('path');
-const inquirer = require('inquirer');
 const ora = require('ora');
-const chalk = require('chalk');
 const ProgressBar = require('progress');
 const config = require('./config');
 
@@ -39,17 +37,6 @@ c.on('ready', async () => {
 });
 
 async function main() {
-  // let answer = await inquirer.prompt([
-  //   {
-  //     type: 'password',
-  //     name: 'password',
-  //     message: '请输入服务器密码:'
-  //   }
-  // ]);
-  // const { password } = answer;
-  // if (!password) {
-  //   process.exit(0);
-  // }
   c.connect({
     ...config,
     password: process.env.FTP_PASSWORD
