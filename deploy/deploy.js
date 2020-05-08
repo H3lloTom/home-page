@@ -39,20 +39,20 @@ c.on('ready', async () => {
 });
 
 async function main() {
-  let answer = await inquirer.prompt([
-    {
-      type: 'password',
-      name: 'password',
-      message: '请输入服务器密码:'
-    }
-  ]);
-  const { password } = answer;
-  if (!password) {
-    process.exit(0);
-  }
+  // let answer = await inquirer.prompt([
+  //   {
+  //     type: 'password',
+  //     name: 'password',
+  //     message: '请输入服务器密码:'
+  //   }
+  // ]);
+  // const { password } = answer;
+  // if (!password) {
+  //   process.exit(0);
+  // }
   c.connect({
     ...config,
-    password
+    password:'xyq52099.'
   });
 }
 
