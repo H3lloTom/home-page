@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.newslist {
+  width: 600px;
+  flex-basis: 600px;
+}
+.image {
+  min-width: 250px;
+}
+.digest{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  margin: 0.5rem 0;
+  max-height: 4em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
