@@ -4,7 +4,6 @@ import AV from 'leancloud-storage';
 import 'react-virtualized/styles.css';
 import './index.scss';
 import App from './App';
-// import * as serviceWorker from './serviceWorker';
 
 AV.init({
   appId: 'mdia1eUdHV2dArmqzsY0VQ3b-gzGzoHsz',
