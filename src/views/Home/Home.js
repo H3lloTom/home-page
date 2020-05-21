@@ -6,10 +6,14 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiTitle,
-  EuiBadge
+  EuiBadge,
+  EuiLoadingContent
 } from '@elastic/eui';
 import { instance } from '@@/api';
 import styles from './index.module.scss';
+
+const NewsLoading = () =>
+  [...Array(10)].map((n, i) => <EuiLoadingContent key={i} />);
 
 const News = props => {
   const { news } = props;
@@ -48,10 +52,12 @@ const News = props => {
 
 const Home = props => {
   const [newsList, setNewsList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const fetchNews = async () => {
     let res = await instance.get('/bulletin/index');
     const { newslist } = res;
     setNewsList(newslist);
+    setLoading(false);
   };
   useEffect(() => {
     fetchNews();
@@ -59,9 +65,13 @@ const Home = props => {
   return (
     <EuiFlexGroup justifyContent="center">
       <EuiFlexItem style={{ maxWidth: 600 }}>
-        {newsList.map((n, index) => (
-          <News key={index} news={n}></News>
-        ))}
+        {loading ? (
+          <NewsLoading />
+        ) : (
+          newsList.map((n, index) => (
+            <News key={'_news' + index} news={n}></News>
+          ))
+        )}
       </EuiFlexItem>
     </EuiFlexGroup>
   );
