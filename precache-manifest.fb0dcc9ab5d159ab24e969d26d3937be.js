@@ -4,7 +4,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "//cdn.jsdelivr.net/gh/H3lloTom/home-page@build/editor.worker.js"
   },
   {
-    "revision": "b431b581dc781983c03c7971bdf85f5f",
+    "revision": "b43a0c5f907e888e95babaf728f2e88b",
     "url": "//cdn.jsdelivr.net/gh/H3lloTom/home-page@build/index.html"
   },
   {
@@ -12,7 +12,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "//cdn.jsdelivr.net/gh/H3lloTom/home-page@build/static/css/377.5fb18793.chunk.css"
   },
   {
-    "revision": "1719d11c02553a48a08d",
+    "revision": "b4b266af56cc109b725b",
     "url": "//cdn.jsdelivr.net/gh/H3lloTom/home-page@build/static/css/main.4c6f5de5.chunk.css"
   },
   {
@@ -1528,8 +1528,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "//cdn.jsdelivr.net/gh/H3lloTom/home-page@build/static/js/icon.wrench-js.04906aeb.chunk.js"
   },
   {
-    "revision": "1719d11c02553a48a08d",
-    "url": "//cdn.jsdelivr.net/gh/H3lloTom/home-page@build/static/js/main.5f46684e.chunk.js"
+    "revision": "b4b266af56cc109b725b",
+    "url": "//cdn.jsdelivr.net/gh/H3lloTom/home-page@build/static/js/main.39e3f48d.chunk.js"
   },
   {
     "revision": "4de196cb5b239fe9a53f",
